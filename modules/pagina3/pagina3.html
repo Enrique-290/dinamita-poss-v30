@@ -2,11 +2,11 @@
   <header class="pg3-topbar">
     <div>
       <h1>Página 3.0</h1>
-      <p>Base estructural con router simple y módulos separados.</p>
+      <p>Render funcional por módulos con rutas base para una web real.</p>
     </div>
     <div class="pg3-badges">
-      <span class="pg3-badge">V30.0</span>
-      <span class="pg3-badge pg3-badge--soft">Base</span>
+      <span class="pg3-badge">V30.1</span>
+      <span class="pg3-badge pg3-badge--soft">Render funcional</span>
     </div>
   </header>
 
@@ -21,7 +21,7 @@
       </nav>
 
       <div class="pg3-section">
-        <h4>Editor base</h4>
+        <h4>General</h4>
         <label>Nombre del negocio</label>
         <input id="pg3-businessName" class="input" placeholder="Dinamita Gym">
         <label>Título principal</label>
@@ -30,23 +30,33 @@
         <textarea id="pg3-heroSubtitle" class="input" rows="3" placeholder="Tu tienda y sistema conectados."></textarea>
       </div>
 
+      <div class="pg3-section">
+        <h4>Contacto base</h4>
+        <label>Teléfono</label>
+        <input id="pg3-phone" class="input" placeholder="5512345678">
+        <label>Dirección</label>
+        <textarea id="pg3-address" class="input" rows="2" placeholder="Dirección del negocio"></textarea>
+      </div>
+
+      <div class="pg3-section">
+        <h4>Visualización</h4>
+        <label>Límite catálogo</label>
+        <input id="pg3-limitCatalog" class="input" type="number" min="4" max="24" step="1" placeholder="8">
+      </div>
+
       <div class="pg3-actions">
         <button id="pg3-saveBtn" class="btn" type="button">Guardar</button>
         <button id="pg3-resetBtn" class="btn ghost" type="button">Restablecer</button>
       </div>
 
       <div class="pg3-section">
-        <h4>Estructura creada</h4>
+        <h4>Estructura activa</h4>
         <ul class="pg3-tree">
-          <li>pages/index.html</li>
-          <li>assets/styles.css</li>
-          <li>assets/app.js</li>
-          <li>modules/header.js</li>
-          <li>modules/banner.js</li>
-          <li>modules/catalogo.js</li>
-          <li>modules/carrito.js</li>
-          <li>modules/contacto.js</li>
-          <li>modules/router.js</li>
+          <li>Header</li>
+          <li>Hero</li>
+          <li>Inicio / Tienda / Categoría / Producto</li>
+          <li>Contacto</li>
+          <li>Footer</li>
         </ul>
       </div>
     </aside>
@@ -54,7 +64,7 @@
     <section class="pg3-card pg3-previewCard">
       <div class="pg3-previewHead">
         <div>
-          <h3>Vista previa estructural</h3>
+          <h3>Vista previa funcional</h3>
           <p id="pg3-currentRouteLabel">Ruta actual: Inicio</p>
         </div>
         <span class="pg3-chip">Router base activo</span>
