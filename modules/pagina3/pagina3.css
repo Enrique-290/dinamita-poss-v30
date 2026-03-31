@@ -35,3 +35,18 @@
 .pg3-productActions .btn:active,.pg3-cartActions .btn:active,.pg3-cartFooter .btn:active,.pg3-heroActions .btn:active,.pg3-contactActions .btn:active,.pg3-routeNav .btn:active{transform:translateY(1px);box-shadow:none}
 .pg3-productActions .btn:focus-visible,.pg3-cartActions .btn:focus-visible,.pg3-cartFooter .btn:focus-visible,.pg3-heroActions .btn:focus-visible,.pg3-contactActions .btn:focus-visible,.pg3-routeNav .btn:focus-visible{outline:2px solid #c00000;outline-offset:2px}
 @media (max-width: 720px){.pg3-cartItem{grid-template-columns:1fr}.pg3-cartActions{justify-content:flex-start}}
+
+.pg3-bannerPreviewWrap{min-height:86px;border:1px dashed #e7d1d1;border-radius:12px;background:#faf7f7;display:grid;place-items:center;overflow:hidden}
+.pg3-bannerPreview{display:none;width:100%;height:140px;object-fit:cover}
+.pg3-webBrandRow{display:flex;align-items:center;gap:12px}
+.pg3-logo{width:58px;height:58px;border-radius:14px;object-fit:cover;border:1px solid #eee;background:#fff}
+.pg3-logoFallback{width:58px;height:58px;border-radius:14px;background:#fff1f1;border:1px solid #f0b0b0;color:#9b0000;font-weight:800;display:grid;place-items:center}
+.pg3-heroWrap{display:grid;gap:12px}
+.pg3-hero--media{min-height:340px;background-size:cover;background-position:center;border-radius:18px;overflow:hidden;position:relative}
+.pg3-heroOverlay{display:grid;gap:12px;align-content:end;min-height:340px;padding:28px;background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.56));color:#fff}
+.pg3-heroOverlay p,.pg3-heroOverlay small{color:#fff}
+.pg3-heroSecondary{height:180px;border-radius:18px;background-size:cover;background-position:center;border:1px solid #eee}
+.pg3-productMedia{overflow:hidden;padding:0}
+.pg3-productMedia--detail{height:280px}
+.pg3-productImg{width:100%;height:100%;display:block;object-fit:contain;background:#fff}
+.pg3-productPlaceholder{display:grid;place-items:center;width:100%;height:100%;min-height:112px;color:#9b0000;font-weight:700;background:linear-gradient(135deg,#fff1f1,#f6f6f6)}

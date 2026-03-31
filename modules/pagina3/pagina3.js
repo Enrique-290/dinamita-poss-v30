@@ -7,6 +7,8 @@
     businessName: business.name || 'Dinamita Gym',
     heroTitle: 'Explota tu potencial',
     heroSubtitle: 'Página 3.0 ahora ya se comporta como una web real con tienda, categoría y producto.',
+    bannerPrimary: '',
+    bannerSecondary: '',
     phone: business.phone || '',
     address: business.address || '',
     hours: '',
@@ -26,6 +28,12 @@
     businessName: document.getElementById('pg3-businessName'),
     heroTitle: document.getElementById('pg3-heroTitle'),
     heroSubtitle: document.getElementById('pg3-heroSubtitle'),
+    bannerPrimaryFile: document.getElementById('pg3-bannerPrimaryFile'),
+    bannerPrimaryPreview: document.getElementById('pg3-bannerPrimaryPreview'),
+    bannerPrimaryClear: document.getElementById('pg3-bannerPrimaryClear'),
+    bannerSecondaryFile: document.getElementById('pg3-bannerSecondaryFile'),
+    bannerSecondaryPreview: document.getElementById('pg3-bannerSecondaryPreview'),
+    bannerSecondaryClear: document.getElementById('pg3-bannerSecondaryClear'),
     phone: document.getElementById('pg3-phone'),
     address: document.getElementById('pg3-address'),
     hours: document.getElementById('pg3-hours'),
@@ -65,6 +73,8 @@
     els.businessName.value = state.businessName || '';
     els.heroTitle.value = state.heroTitle || '';
     els.heroSubtitle.value = state.heroSubtitle || '';
+    setBannerPreview(els.bannerPrimaryPreview, state.bannerPrimary);
+    setBannerPreview(els.bannerSecondaryPreview, state.bannerSecondary);
     els.phone.value = state.phone || '';
     els.address.value = state.address || '';
     els.hours.value = state.hours || '';
@@ -80,6 +90,10 @@
     bindInput(els.businessName, 'businessName');
     bindInput(els.heroTitle, 'heroTitle');
     bindInput(els.heroSubtitle, 'heroSubtitle');
+    bindImageInput(els.bannerPrimaryFile, 'bannerPrimary', els.bannerPrimaryPreview);
+    bindImageInput(els.bannerSecondaryFile, 'bannerSecondary', els.bannerSecondaryPreview);
+    els.bannerPrimaryClear.addEventListener('click', ()=>{ state.bannerPrimary=''; if(els.bannerPrimaryFile) els.bannerPrimaryFile.value=''; setBannerPreview(els.bannerPrimaryPreview,''); renderPreview(); saveState(); });
+    els.bannerSecondaryClear.addEventListener('click', ()=>{ state.bannerSecondary=''; if(els.bannerSecondaryFile) els.bannerSecondaryFile.value=''; setBannerPreview(els.bannerSecondaryPreview,''); renderPreview(); saveState(); });
     bindInput(els.phone, 'phone');
     bindInput(els.address, 'address');
     bindInput(els.hours, 'hours');
@@ -106,6 +120,25 @@
 
   function bindInput(el, key){
     el.addEventListener('input', e=>{ state[key] = e.target.value; renderPreview(); });
+  }
+
+  function bindImageInput(el, key, previewEl){
+    if(!el) return;
+    el.addEventListener('change', e=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(!file.type.startsWith('image/')){ alert('Archivo no es imagen.'); return; }
+      const reader = new FileReader();
+      reader.onload = ()=>{ state[key] = String(reader.result || ''); setBannerPreview(previewEl, state[key]); renderPreview(); saveState(); };
+      reader.onerror = ()=> alert('No se pudo procesar la imagen.');
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function setBannerPreview(el, src){
+    if(!el) return;
+    if(src){ el.src = src; el.style.display='block'; }
+    else { el.removeAttribute('src'); el.style.display='none'; }
   }
 
   function navigate(route, opts={}){
@@ -303,11 +336,12 @@
   }
 
   function renderHeader(){
+    const logo = business.logoDataUrl || st?.business?.logoDataUrl || '';
+    const logoHtml = logo ? `<img class="pg3-logo" src="${escapeHtmlAttr(logo)}" alt="Logo">` : `<div class="pg3-logoFallback">${escapeHtml(initials(state.businessName))}</div>`;
     return `
       <header class="pg3-webHeader">
         <div class="pg3-webBrand">
-          <strong>${escapeHtml(state.businessName)}</strong>
-          <small>Página 3.0 · Router funcional</small>
+          <div class="pg3-webBrandRow">${logoHtml}<div><strong>${escapeHtml(state.businessName)}</strong><small>Página 3.0 · Router funcional</small></div></div>
         </div>
         <nav class="pg3-webNav">
           ${navBtn('inicio','Inicio')}
@@ -324,15 +358,22 @@
   }
 
   function renderHero(){
+    const primaryStyle = state.bannerPrimary ? `style="background-image:url('${escapeHtmlAttr(state.bannerPrimary)}')"` : '';
+    const secondary = state.bannerSecondary ? `
+      <div class="pg3-heroSecondary" style="background-image:url('${escapeHtmlAttr(state.bannerSecondary)}')"></div>` : '';
     return `
-      <section class="pg3-hero">
-        <small>Estructura primero · Diseño después</small>
-        <h2>${escapeHtml(state.heroTitle)}</h2>
-        <p>${escapeHtml(state.heroSubtitle)}</p>
-        <div class="pg3-heroActions">
-          <button type="button" class="btn" data-preview-route="tienda">Ir a tienda</button>
-          <button type="button" class="btn ghost" data-preview-route="categoria" data-category="${escapeHtmlAttr(categories()[0] || '')}">Ver categoría</button>
-        </div>
+      <section class="pg3-heroWrap">
+        <section class="pg3-hero pg3-hero--media" ${primaryStyle}>
+          <div class="pg3-heroOverlay">
+            <small>Estructura primero · Diseño después</small>
+            <h2>${escapeHtml(state.heroTitle)}</h2>
+            <p>${escapeHtml(state.heroSubtitle)}</p>
+            <div class="pg3-heroActions">
+              <button type="button" class="btn" data-preview-route="tienda">Ir a tienda</button>
+              <button type="button" class="btn ghost" data-preview-route="categoria" data-category="${escapeHtmlAttr(categories()[0] || '')}">Ver categoría</button>
+            </div>
+          </div>
+        </section>${secondary}
       </section>`;
   }
 
@@ -406,7 +447,7 @@
     return `
       <section class="pg3-panel pg3-split">
         <div>
-          <div class="pg3-productMedia">${productMediaLabel(p)}</div>
+          <div class="pg3-productMedia pg3-productMedia--detail">${productMediaHtml(p)}</div>
         </div>
         <div>
           <div class="pg3-productMeta">
@@ -434,7 +475,7 @@
   function productCard(p){
     return `
       <article class="pg3-product">
-        <div class="pg3-productMedia">${productMediaLabel(p)}</div>
+        <div class="pg3-productMedia">${productMediaHtml(p)}</div>
         <div class="pg3-productTop">
           <small>${escapeHtml(normalizeCat(p.category))}</small>
           <span class="pg3-stock">${Number(p.stock||0)} pzs</span>
@@ -449,9 +490,21 @@
       </article>`;
   }
 
+  function productMediaHtml(p){
+    if(p && p.image){
+      return `<img class="pg3-productImg" src="${escapeHtmlAttr(p.image)}" alt="${escapeHtmlAttr(p.name || 'Producto')}">`;
+    }
+    return `<span class="pg3-productPlaceholder">${productMediaLabel(p)}</span>`;
+  }
+
   function productMediaLabel(p){
     const words = String(p.name||'PR').trim().split(/\s+/).slice(0,2);
     return escapeHtml(words.map(w=> w[0]?.toUpperCase() || '').join('') || 'DG');
+  }
+
+  function initials(name){
+    const words = String(name || 'DG').trim().split(/\s+/).slice(0,2);
+    return words.map(w=> w[0]?.toUpperCase() || '').join('') || 'DG';
   }
 
   function productDescription(p){
