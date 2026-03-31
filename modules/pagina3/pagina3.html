@@ -1,0 +1,65 @@
+<section class="pg3-shell">
+  <header class="pg3-topbar">
+    <div>
+      <h1>Página 3.0</h1>
+      <p>Base estructural con router simple y módulos separados.</p>
+    </div>
+    <div class="pg3-badges">
+      <span class="pg3-badge">V30.0</span>
+      <span class="pg3-badge pg3-badge--soft">Base</span>
+    </div>
+  </header>
+
+  <div class="pg3-grid">
+    <aside class="pg3-card pg3-navCard">
+      <h3>Rutas base</h3>
+      <nav id="pg3-routeNav" class="pg3-routeNav">
+        <button type="button" class="btn active" data-route="inicio">Inicio</button>
+        <button type="button" class="btn ghost" data-route="tienda">Tienda</button>
+        <button type="button" class="btn ghost" data-route="categoria">Categoría</button>
+        <button type="button" class="btn ghost" data-route="producto">Producto</button>
+      </nav>
+
+      <div class="pg3-section">
+        <h4>Editor base</h4>
+        <label>Nombre del negocio</label>
+        <input id="pg3-businessName" class="input" placeholder="Dinamita Gym">
+        <label>Título principal</label>
+        <input id="pg3-heroTitle" class="input" placeholder="Explota tu potencial">
+        <label>Subtítulo</label>
+        <textarea id="pg3-heroSubtitle" class="input" rows="3" placeholder="Tu tienda y sistema conectados."></textarea>
+      </div>
+
+      <div class="pg3-actions">
+        <button id="pg3-saveBtn" class="btn" type="button">Guardar</button>
+        <button id="pg3-resetBtn" class="btn ghost" type="button">Restablecer</button>
+      </div>
+
+      <div class="pg3-section">
+        <h4>Estructura creada</h4>
+        <ul class="pg3-tree">
+          <li>pages/index.html</li>
+          <li>assets/styles.css</li>
+          <li>assets/app.js</li>
+          <li>modules/header.js</li>
+          <li>modules/banner.js</li>
+          <li>modules/catalogo.js</li>
+          <li>modules/carrito.js</li>
+          <li>modules/contacto.js</li>
+          <li>modules/router.js</li>
+        </ul>
+      </div>
+    </aside>
+
+    <section class="pg3-card pg3-previewCard">
+      <div class="pg3-previewHead">
+        <div>
+          <h3>Vista previa estructural</h3>
+          <p id="pg3-currentRouteLabel">Ruta actual: Inicio</p>
+        </div>
+        <span class="pg3-chip">Router base activo</span>
+      </div>
+      <div id="pg3-previewRoot" class="pg3-previewRoot"></div>
+    </section>
+  </div>
+</section>
