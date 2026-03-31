@@ -1,8 +1,9 @@
 (function(){
   const STORAGE_KEY = 'dp_pagina3_state';
 
-  const st = (typeof dpGetState === 'function') ? dpGetState() : { meta:{business:{}}, products:[] };
-  const business = st?.meta?.business || {};
+  const st = (typeof dpGetState === 'function') ? dpGetState() : { config:{business:{}}, products:[] };
+  const cfg = (typeof dpGetConfig === 'function') ? dpGetConfig() : (st?.config || {});
+  const business = cfg?.business || st?.config?.business || st?.meta?.business || {};
   const defaults = {
     businessName: business.name || 'Dinamita Gym',
     heroTitle: 'Explota tu potencial',
@@ -336,7 +337,7 @@
   }
 
   function renderHeader(){
-    const logo = business.logoDataUrl || st?.business?.logoDataUrl || '';
+    const logo = business.logoDataUrl || st?.config?.business?.logoDataUrl || st?.meta?.business?.logoDataUrl || '';
     const logoHtml = logo ? `<img class="pg3-logo" src="${escapeHtmlAttr(logo)}" alt="Logo">` : `<div class="pg3-logoFallback">${escapeHtml(initials(state.businessName))}</div>`;
     return `
       <header class="pg3-webHeader">
