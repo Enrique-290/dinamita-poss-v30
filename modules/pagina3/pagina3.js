@@ -12,7 +12,8 @@
     route: 'inicio',
     selectedCategory: '',
     selectedProductId: (st.products && st.products[0] && st.products[0].id) || '',
-    limitCatalog: 8
+    limitCatalog: 8,
+    search: ''
   };
 
   const state = loadState();
@@ -23,6 +24,7 @@
     phone: document.getElementById('pg3-phone'),
     address: document.getElementById('pg3-address'),
     limitCatalog: document.getElementById('pg3-limitCatalog'),
+    search: document.getElementById('pg3-search'),
     routeLabel: document.getElementById('pg3-currentRouteLabel'),
     previewRoot: document.getElementById('pg3-previewRoot'),
     saveBtn: document.getElementById('pg3-saveBtn'),
@@ -56,6 +58,7 @@
     els.phone.value = state.phone || '';
     els.address.value = state.address || '';
     els.limitCatalog.value = state.limitCatalog || 8;
+    els.search.value = state.search || '';
     syncRouteButtons();
   }
 
@@ -67,9 +70,10 @@
     bindInput(els.address, 'address');
     els.limitCatalog.addEventListener('input', e=>{
       const n = Number(e.target.value || 8);
-      state.limitCatalog = Math.max(4, Math.min(24, n));
+      state.limitCatalog = Math.max(4, Math.min(60, n));
       renderPreview();
     });
+    bindInput(els.search, 'search');
     els.saveBtn.addEventListener('click', ()=>{ saveState(); alert('Página 3.0 guardada.'); });
     els.resetBtn.addEventListener('click', ()=>{
       Object.assign(state, defaults);
@@ -89,6 +93,7 @@
   function navigate(route, opts={}){
     state.route = route;
     if(opts.category !== undefined) state.selectedCategory = opts.category;
+    if(route !== 'tienda' && route !== 'categoria') state.search = state.search || '';
     if(opts.productId !== undefined) state.selectedProductId = opts.productId;
     syncRouteButtons();
     renderPreview();
@@ -116,7 +121,18 @@
   }
 
   function featuredProducts(){
-    return allProducts().slice(0, Math.max(1, Number(state.limitCatalog||8)));
+    return filteredProducts().slice(0, Math.max(1, Number(state.limitCatalog||8)));
+  }
+
+  function filteredProducts(){
+    const q = String(state.search || '').trim().toLowerCase();
+    const selected = normalizeCat(state.selectedCategory || '');
+    return allProducts().filter(p=>{
+      const byCat = !selected || selected === 'General' ? true : normalizeCat(p.category) === selected;
+      const hay = [p.name,p.sku,p.barcode,p.category].map(v=>String(v||'').toLowerCase()).join(' ');
+      const bySearch = !q || hay.includes(q);
+      return byCat && bySearch;
+    });
   }
 
   function latestProducts(){
@@ -155,6 +171,14 @@
         productId: btn.dataset.productId
       }));
     });
+    const search = els.previewRoot.querySelector('[data-preview-search]');
+    if(search){
+      search.addEventListener('input', e=>{
+        state.search = e.target.value || '';
+        if(state.route !== 'tienda') state.route = 'tienda';
+        renderPreview();
+      });
+    }
   }
 
   function renderHeader(){
@@ -220,12 +244,21 @@
   }
 
   function renderTienda(){
-    const items = featuredProducts();
+    const cats = categories();
+    const items = filteredProducts().slice(0, Math.max(1, Number(state.limitCatalog||8)));
     return `
       <section class="pg3-panel">
         <h3>Tienda</h3>
-        <p>Catálogo básico conectado a productos reales de la TPV.</p>
-        <div class="pg3-products">${items.map(productCard).join('') || '<div class="pg3-empty">No hay productos en el catálogo.</div>'}</div>
+        <p>Catálogo conectado a productos reales de la TPV con buscador y filtro activo.</p>
+        <div class="pg3-tools">
+          <input class="pg3-search" type="text" value="${escapeHtmlAttr(state.search || '')}" placeholder="Buscar producto..." data-preview-search>
+          <div class="pg3-cats">
+            <button type="button" class="pg3-pill ${!state.selectedCategory ? 'active' : ''}" data-preview-route="tienda" data-category="">Todo</button>
+            ${cats.map(c=> `<button type="button" class="pg3-pill ${normalizeCat(c)===normalizeCat(state.selectedCategory||'') ? 'active' : ''}" data-preview-route="tienda" data-category="${escapeHtmlAttr(c)}">${escapeHtml(c)}</button>`).join('')}
+          </div>
+          <div class="pg3-count">Mostrando ${items.length} producto(s)${state.selectedCategory ? ` de ${escapeHtml(state.selectedCategory)}` : ''}${state.search ? ` que coinciden con "${escapeHtml(state.search)}"` : ''}.</div>
+        </div>
+        <div class="pg3-products">${items.map(productCard).join('') || '<div class="pg3-empty">No hay productos con ese filtro.</div>'}</div>
       </section>`;
   }
 
