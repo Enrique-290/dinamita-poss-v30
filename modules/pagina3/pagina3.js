@@ -9,6 +9,10 @@
     heroSubtitle: 'Página 3.0 ahora ya se comporta como una web real con tienda, categoría y producto.',
     phone: business.phone || '',
     address: business.address || '',
+    hours: '',
+    maps: '',
+    facebook: '',
+    instagram: '',
     route: 'inicio',
     selectedCategory: '',
     selectedProductId: (st.products && st.products[0] && st.products[0].id) || '',
@@ -23,6 +27,10 @@
     heroSubtitle: document.getElementById('pg3-heroSubtitle'),
     phone: document.getElementById('pg3-phone'),
     address: document.getElementById('pg3-address'),
+    hours: document.getElementById('pg3-hours'),
+    maps: document.getElementById('pg3-maps'),
+    facebook: document.getElementById('pg3-facebook'),
+    instagram: document.getElementById('pg3-instagram'),
     limitCatalog: document.getElementById('pg3-limitCatalog'),
     search: document.getElementById('pg3-search'),
     routeLabel: document.getElementById('pg3-currentRouteLabel'),
@@ -57,6 +65,10 @@
     els.heroSubtitle.value = state.heroSubtitle || '';
     els.phone.value = state.phone || '';
     els.address.value = state.address || '';
+    els.hours.value = state.hours || '';
+    els.maps.value = state.maps || '';
+    els.facebook.value = state.facebook || '';
+    els.instagram.value = state.instagram || '';
     els.limitCatalog.value = state.limitCatalog || 8;
     els.search.value = state.search || '';
     syncRouteButtons();
@@ -68,6 +80,10 @@
     bindInput(els.heroSubtitle, 'heroSubtitle');
     bindInput(els.phone, 'phone');
     bindInput(els.address, 'address');
+    bindInput(els.hours, 'hours');
+    bindInput(els.maps, 'maps');
+    bindInput(els.facebook, 'facebook');
+    bindInput(els.instagram, 'instagram');
     els.limitCatalog.addEventListener('input', e=>{
       const n = Number(e.target.value || 8);
       state.limitCatalog = Math.max(4, Math.min(60, n));
@@ -281,24 +297,31 @@
     if(!p){
       return `<section class="pg3-panel"><div class="pg3-empty">No hay producto seleccionado.</div></section>`;
     }
+    const desc = productDescription(p);
     return `
       <section class="pg3-panel pg3-split">
         <div>
           <div class="pg3-productMedia">${productMediaLabel(p)}</div>
         </div>
         <div>
+          <div class="pg3-productMeta">
+            <span class="pg3-tag">${escapeHtml(normalizeCat(p.category))}</span>
+            <span class="pg3-tag">SKU ${escapeHtml(p.sku || '—')}</span>
+          </div>
           <h3>${escapeHtml(p.name || 'Producto')}</h3>
-          <p>${escapeHtml(normalizeCat(p.category))}</p>
+          <p class="pg3-productDesc">${escapeHtml(desc)}</p>
           <dl class="pg3-kv">
             <dt>Precio</dt><dd>${money(p.price)}</dd>
             <dt>Stock</dt><dd>${Number(p.stock||0)} pzs</dd>
             <dt>SKU</dt><dd>${escapeHtml(p.sku || '—')}</dd>
             <dt>Código</dt><dd>${escapeHtml(p.barcode || '—')}</dd>
+            <dt>Categoría</dt><dd>${escapeHtml(normalizeCat(p.category))}</dd>
           </dl>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          <div class="pg3-detailActions">
             <button type="button" class="btn ghost" data-preview-route="categoria" data-category="${escapeHtmlAttr(normalizeCat(p.category))}">Ver categoría</button>
             <button type="button" class="btn" data-preview-route="tienda">Volver a tienda</button>
           </div>
+          <div class="pg3-miniNote">Producto tomado del catálogo real de la TPV.</div>
         </div>
       </section>`;
   }
@@ -325,21 +348,33 @@
     return escapeHtml(words.map(w=> w[0]?.toUpperCase() || '').join('') || 'DG');
   }
 
+  function productDescription(p){
+    const cat = normalizeCat(p.category);
+    const stock = Number(p.stock||0);
+    return `${p.name || 'Producto'} pertenece a la categoría ${cat} y actualmente cuenta con ${stock} pieza(s) disponibles en el catálogo.`;
+  }
+
   function renderContacto(){
     return `
       <section class="pg3-panel">
         <h3>Contacto</h3>
-        <dl class="pg3-kv">
-          <dt>Teléfono</dt><dd>${escapeHtml(state.phone || 'Sin definir')}</dd>
-          <dt>Dirección</dt><dd>${escapeHtml(state.address || 'Sin definir')}</dd>
-          <dt>Productos</dt><dd>${allProducts().length} en catálogo</dd>
-          <dt>Categorías</dt><dd>${categories().length}</dd>
-        </dl>
+        <p>Base de contacto reforzada para una página real del negocio.</p>
+        <div class="pg3-contactGrid">
+          <div class="pg3-contactCard"><strong>Teléfono</strong><span>${escapeHtml(state.phone || 'Sin definir')}</span></div>
+          <div class="pg3-contactCard"><strong>Dirección</strong><span>${escapeHtml(state.address || 'Sin definir')}</span></div>
+          <div class="pg3-contactCard"><strong>Horario</strong><span>${escapeHtml(state.hours || 'Sin definir')}</span></div>
+          <div class="pg3-contactCard"><strong>Cobertura</strong><span>${allProducts().length} productos · ${categories().length} categorías</span></div>
+        </div>
+        <div class="pg3-contactActions">
+          ${state.maps ? `<a class="btn ghost" href="${escapeHtmlAttr(state.maps)}" target="_blank" rel="noopener">Google Maps</a>` : ''}
+          ${state.facebook ? `<a class="btn ghost" href="${escapeHtmlAttr(state.facebook)}" target="_blank" rel="noopener">Facebook</a>` : ''}
+          ${state.instagram ? `<a class="btn ghost" href="${escapeHtmlAttr(state.instagram)}" target="_blank" rel="noopener">Instagram</a>` : ''}
+        </div>
       </section>`;
   }
 
   function renderFooter(){
-    return `<footer class="pg3-footer">Página 3.0 · Render modular funcional listo para carrito, WhatsApp y exportación.</footer>`;
+    return `<footer class="pg3-footer">Página 3.0 · Render modular con tienda, producto y contacto reforzado.</footer>`;
   }
 
   function money(v){
