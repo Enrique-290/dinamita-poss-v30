@@ -243,8 +243,7 @@
       return;
     }
     const lines = items.map(item => `- ${item.product.name} x${item.qty} ${money(item.subtotal)}`);
-    const message = ['Hola, me interesa este pedido:', '', ...lines, '', `Total: ${money(cartTotal())}`].join('
-');
+    const message = ['Hola, me interesa este pedido:', '', ...lines, '', `Total: ${money(cartTotal())}`].join('\n');
     openWhatsApp(message);
   }
 
@@ -298,9 +297,7 @@
       btn.addEventListener('click', () => {
         const p = allProducts().find(item => item.id === btn.dataset.productWa);
         if(!p) return;
-        openWhatsApp(`Hola, me interesa:
-${p.name}
-Precio: ${money(p.price)}`);
+        openWhatsApp(`Hola, me interesa:\n${p.name}\nPrecio: ${money(p.price)}`);
       });
     });
   }
