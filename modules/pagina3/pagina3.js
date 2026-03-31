@@ -17,7 +17,8 @@
     selectedCategory: '',
     selectedProductId: (st.products && st.products[0] && st.products[0].id) || '',
     limitCatalog: 8,
-    search: ''
+    search: '',
+    cart: []
   };
 
   const state = loadState();
@@ -48,7 +49,8 @@
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
       if(!raw) return { ...defaults };
-      return { ...defaults, ...JSON.parse(raw) };
+      const parsed = JSON.parse(raw);
+      return { ...defaults, ...parsed, cart: Array.isArray(parsed.cart) ? parsed.cart : [] };
     }catch(e){
       console.warn('Página 3.0 state error', e);
       return { ...defaults };
@@ -92,7 +94,7 @@
     bindInput(els.search, 'search');
     els.saveBtn.addEventListener('click', ()=>{ saveState(); alert('Página 3.0 guardada.'); });
     els.resetBtn.addEventListener('click', ()=>{
-      Object.assign(state, defaults);
+      Object.assign(state, JSON.parse(JSON.stringify(defaults)));
       hydrateForm();
       renderPreview();
       saveState();
@@ -163,6 +165,89 @@
     return allProducts().find(p=> p.id === state.selectedProductId) || allProducts()[0] || null;
   }
 
+  function cartItems(){
+    return Array.isArray(state.cart) ? state.cart : [];
+  }
+
+  function cartDetailedItems(){
+    return cartItems().map(item => {
+      const product = allProducts().find(p => p.id === item.id);
+      if(!product) return null;
+      const qty = Math.max(1, Number(item.qty || 1));
+      const price = Number(product.price || 0);
+      return { product, qty, subtotal: qty * price };
+    }).filter(Boolean);
+  }
+
+  function cartCount(){
+    return cartDetailedItems().reduce((acc, item) => acc + item.qty, 0);
+  }
+
+  function cartTotal(){
+    return cartDetailedItems().reduce((acc, item) => acc + item.subtotal, 0);
+  }
+
+  function addToCart(productId){
+    const product = allProducts().find(p => p.id === productId);
+    if(!product) return;
+    const existing = cartItems().find(item => item.id === productId);
+    if(existing) existing.qty = Math.max(1, Number(existing.qty || 1) + 1);
+    else state.cart.push({ id: productId, qty: 1 });
+    saveState();
+    renderPreview();
+  }
+
+  function updateCartQty(productId, delta){
+    const item = cartItems().find(entry => entry.id === productId);
+    if(!item) return;
+    item.qty = Math.max(1, Number(item.qty || 1) + delta);
+    saveState();
+    renderPreview();
+  }
+
+  function removeFromCart(productId){
+    state.cart = cartItems().filter(entry => entry.id !== productId);
+    saveState();
+    renderPreview();
+  }
+
+  function clearCart(){
+    state.cart = [];
+    saveState();
+    renderPreview();
+  }
+
+  function normalizePhone(raw){
+    const digits = String(raw || '').replace(/\D+/g,'');
+    if(!digits) return '';
+    if(digits.startsWith('521')) return digits;
+    if(digits.startsWith('52') && digits.length === 12) return '521' + digits.slice(2);
+    if(digits.length === 10) return '521' + digits;
+    return digits;
+  }
+
+  function openWhatsApp(message){
+    const phone = normalizePhone(state.phone || business.phone || '');
+    if(!phone){
+      alert('Captura un teléfono o WhatsApp válido en Página 3.0.');
+      return;
+    }
+    const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  function sendCartToWhatsApp(){
+    const items = cartDetailedItems();
+    if(!items.length){
+      alert('Agrega productos al carrito para enviarlos.');
+      return;
+    }
+    const lines = items.map(item => `- ${item.product.name} x${item.qty} ${money(item.subtotal)}`);
+    const message = ['Hola, me interesa este pedido:', '', ...lines, '', `Total: ${money(cartTotal())}`].join('
+');
+    openWhatsApp(message);
+  }
+
   function renderPreview(){
     const categoryLabel = state.route === 'categoria' ? ` · ${state.selectedCategory || 'Sin categoría'}` : '';
     els.routeLabel.textContent = `Ruta actual: ${routeName(state.route)}${categoryLabel}`;
@@ -172,6 +257,7 @@
         ${renderHero()}
         <div class="pg3-content">
           ${renderCurrentRoute()}
+          ${renderCarritoPanel()}
           ${renderContacto()}
         </div>
         ${renderFooter()}
@@ -195,6 +281,28 @@
         renderPreview();
       });
     }
+    els.previewRoot.querySelectorAll('[data-add-cart]').forEach(btn => {
+      btn.addEventListener('click', () => addToCart(btn.dataset.addCart));
+    });
+    els.previewRoot.querySelectorAll('[data-cart-delta]').forEach(btn => {
+      btn.addEventListener('click', () => updateCartQty(btn.dataset.cartId, Number(btn.dataset.cartDelta || 0)));
+    });
+    els.previewRoot.querySelectorAll('[data-cart-remove]').forEach(btn => {
+      btn.addEventListener('click', () => removeFromCart(btn.dataset.cartRemove));
+    });
+    const clearBtn = els.previewRoot.querySelector('[data-cart-clear]');
+    if(clearBtn) clearBtn.addEventListener('click', clearCart);
+    const sendBtn = els.previewRoot.querySelector('[data-cart-send]');
+    if(sendBtn) sendBtn.addEventListener('click', sendCartToWhatsApp);
+    els.previewRoot.querySelectorAll('[data-product-wa]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = allProducts().find(item => item.id === btn.dataset.productWa);
+        if(!p) return;
+        openWhatsApp(`Hola, me interesa:
+${p.name}
+Precio: ${money(p.price)}`);
+      });
+    });
   }
 
   function renderHeader(){
@@ -336,9 +444,10 @@
         </div>
         <strong>${escapeHtml(p.name || 'Producto')}</strong>
         <span class="pg3-price">${money(p.price)}</span>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="pg3-productActions">
+          <button type="button" class="btn" data-add-cart="${escapeHtmlAttr(p.id)}">Agregar</button>
+          <button type="button" class="btn ghost" data-product-wa="${escapeHtmlAttr(p.id)}">WhatsApp</button>
           <button type="button" class="btn ghost" data-preview-route="producto" data-product-id="${escapeHtmlAttr(p.id)}">Ver</button>
-          <button type="button" class="btn ghost" data-preview-route="categoria" data-category="${escapeHtmlAttr(normalizeCat(p.category))}">Categoría</button>
         </div>
       </article>`;
   }
@@ -352,6 +461,43 @@
     const cat = normalizeCat(p.category);
     const stock = Number(p.stock||0);
     return `${p.name || 'Producto'} pertenece a la categoría ${cat} y actualmente cuenta con ${stock} pieza(s) disponibles en el catálogo.`;
+  }
+
+  function renderCarritoPanel(){
+    const items = cartDetailedItems();
+    return `
+      <section class="pg3-panel">
+        <div class="pg3-cartHead">
+          <div>
+            <h3>Carrito</h3>
+            <p>${items.length ? `${cartCount()} producto(s) agregados.` : 'Agrega productos desde la tienda para empezar tu pedido.'}</p>
+          </div>
+          <span class="pg3-tag">${money(cartTotal())}</span>
+        </div>
+        ${items.length ? `
+          <div class="pg3-cartList">
+            ${items.map(item => `
+              <article class="pg3-cartItem">
+                <div>
+                  <strong>${escapeHtml(item.product.name)}</strong>
+                  <small>${escapeHtml(normalizeCat(item.product.category))}</small>
+                </div>
+                <div class="pg3-cartActions">
+                  <button type="button" class="btn ghost" data-cart-delta="-1" data-cart-id="${escapeHtmlAttr(item.product.id)}">-</button>
+                  <span>${item.qty}</span>
+                  <button type="button" class="btn ghost" data-cart-delta="1" data-cart-id="${escapeHtmlAttr(item.product.id)}">+</button>
+                  <strong>${money(item.subtotal)}</strong>
+                  <button type="button" class="btn ghost" data-cart-remove="${escapeHtmlAttr(item.product.id)}">Quitar</button>
+                </div>
+              </article>
+            `).join('')}
+          </div>
+          <div class="pg3-cartFooter">
+            <button type="button" class="btn ghost" data-cart-clear>Vaciar</button>
+            <button type="button" class="btn" data-cart-send>Enviar por WhatsApp</button>
+          </div>
+        ` : `<div class="pg3-empty">Tu carrito está vacío.</div>`}
+      </section>`;
   }
 
   function renderContacto(){

@@ -23,3 +23,15 @@
 .pg3-tag{background:#fff1f1;color:#9b0000;border:1px solid #f0b0b0;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700}
 .pg3-detailActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .pg3-miniNote{font-size:12px;color:#777}
+
+.pg3-cartHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.pg3-cartList{display:grid;gap:10px}
+.pg3-cartItem{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid #eee;border-radius:14px;background:#fff}
+.pg3-cartItem small{display:block;color:#777;margin-top:4px}
+.pg3-cartActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pg3-cartFooter{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:14px}
+.pg3-productActions .btn,.pg3-cartActions .btn,.pg3-cartFooter .btn,.pg3-heroActions .btn,.pg3-contactActions .btn,.pg3-routeNav .btn{transition:transform .12s ease, box-shadow .12s ease, background-color .12s ease, color .12s ease}
+.pg3-productActions .btn:hover,.pg3-cartActions .btn:hover,.pg3-cartFooter .btn:hover,.pg3-heroActions .btn:hover,.pg3-contactActions .btn:hover,.pg3-routeNav .btn:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(192,0,0,.12)}
+.pg3-productActions .btn:active,.pg3-cartActions .btn:active,.pg3-cartFooter .btn:active,.pg3-heroActions .btn:active,.pg3-contactActions .btn:active,.pg3-routeNav .btn:active{transform:translateY(1px);box-shadow:none}
+.pg3-productActions .btn:focus-visible,.pg3-cartActions .btn:focus-visible,.pg3-cartFooter .btn:focus-visible,.pg3-heroActions .btn:focus-visible,.pg3-contactActions .btn:focus-visible,.pg3-routeNav .btn:focus-visible{outline:2px solid #c00000;outline-offset:2px}
+@media (max-width: 720px){.pg3-cartItem{grid-template-columns:1fr}.pg3-cartActions{justify-content:flex-start}}
