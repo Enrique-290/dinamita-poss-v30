@@ -21,6 +21,8 @@
     selectedProductId: (st.products && st.products[0] && st.products[0].id) || '',
     limitCatalog: 8,
     search: '',
+    onlineProductIds: null,
+    onlineProductSearch: '',
     cart: []
   };
 
@@ -43,6 +45,11 @@
     instagram: document.getElementById('pg3-instagram'),
     limitCatalog: document.getElementById('pg3-limitCatalog'),
     search: document.getElementById('pg3-search'),
+    onlineProductSearch: document.getElementById('pg3-onlineProductSearch'),
+    onlineProductsList: document.getElementById('pg3-onlineProductsList'),
+    onlineProductsSummary: document.getElementById('pg3-onlineProductsSummary'),
+    selectAllProducts: document.getElementById('pg3-selectAllProducts'),
+    clearProducts: document.getElementById('pg3-clearProducts'),
     routeLabel: document.getElementById('pg3-currentRouteLabel'),
     previewRoot: document.getElementById('pg3-previewRoot'),
     saveBtn: document.getElementById('pg3-saveBtn'),
@@ -59,7 +66,13 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if(!raw) return { ...defaults };
       const parsed = JSON.parse(raw);
-      return { ...defaults, ...parsed, cart: Array.isArray(parsed.cart) ? parsed.cart : [] };
+      return {
+        ...defaults,
+        ...parsed,
+        onlineProductIds: Array.isArray(parsed.onlineProductIds) ? parsed.onlineProductIds : null,
+        onlineProductSearch: parsed.onlineProductSearch || '',
+        cart: Array.isArray(parsed.cart) ? parsed.cart : []
+      };
     }catch(e){
       console.warn('Página 3.0 state error', e);
       return { ...defaults };
@@ -84,7 +97,9 @@
     els.instagram.value = state.instagram || '';
     els.limitCatalog.value = state.limitCatalog || 8;
     els.search.value = state.search || '';
+    if(els.onlineProductSearch) els.onlineProductSearch.value = state.onlineProductSearch || '';
     syncRouteButtons();
+    renderOnlineProductsList();
   }
 
   function bindEditor(){
@@ -107,6 +122,28 @@
       renderPreview();
     });
     bindInput(els.search, 'search');
+    if(els.onlineProductSearch){
+      els.onlineProductSearch.addEventListener('input', e=>{
+        state.onlineProductSearch = e.target.value || '';
+        renderOnlineProductsList();
+      });
+    }
+    if(els.selectAllProducts){
+      els.selectAllProducts.addEventListener('click', ()=>{
+        state.onlineProductIds = rawProducts().map(p => p.id).filter(Boolean);
+        renderOnlineProductsList();
+        renderPreview();
+        saveState();
+      });
+    }
+    if(els.clearProducts){
+      els.clearProducts.addEventListener('click', ()=>{
+        state.onlineProductIds = [];
+        renderOnlineProductsList();
+        renderPreview();
+        saveState();
+      });
+    }
     els.saveBtn.addEventListener('click', ()=>{ saveState(); alert('Página 3.0 guardada.'); });
     els.resetBtn.addEventListener('click', ()=>{
       Object.assign(state, JSON.parse(JSON.stringify(defaults)));
@@ -159,8 +196,78 @@
     });
   }
 
-  function allProducts(){
+  function rawProducts(){
     return Array.isArray(st.products) ? st.products.slice() : [];
+  }
+
+  function publishedIds(){
+    if(Array.isArray(state.onlineProductIds)) return state.onlineProductIds.map(String);
+    return rawProducts().map(p => String(p.id)).filter(Boolean);
+  }
+
+  function isProductPublished(id){
+    if(!id) return false;
+    if(!Array.isArray(state.onlineProductIds)) return true;
+    return state.onlineProductIds.map(String).includes(String(id));
+  }
+
+  function allProducts(){
+    const ids = publishedIds();
+    const allowed = new Set(ids);
+    return rawProducts().filter(p => p && p.id && allowed.has(String(p.id)));
+  }
+
+
+  function renderOnlineProductsList(){
+    if(!els.onlineProductsList) return;
+    const q = String(state.onlineProductSearch || '').trim().toLowerCase();
+    const products = rawProducts();
+    const visible = products.filter(p => {
+      if(!q) return true;
+      const hay = [p.name,p.sku,p.barcode,p.category].map(v=>String(v||'').toLowerCase()).join(' ');
+      return hay.includes(q);
+    });
+    const selectedCount = allProducts().length;
+    if(els.onlineProductsSummary){
+      els.onlineProductsSummary.textContent = `${selectedCount} de ${products.length} productos visibles en web`;
+    }
+    if(!products.length){
+      els.onlineProductsList.innerHTML = '<div class="pg3-onlineProductEmpty">Aún no hay productos en inventario.</div>';
+      return;
+    }
+    if(!visible.length){
+      els.onlineProductsList.innerHTML = '<div class="pg3-onlineProductEmpty">No hay productos con esa búsqueda.</div>';
+      return;
+    }
+    els.onlineProductsList.innerHTML = visible.map(p=>`
+      <label class="pg3-onlineProductRow">
+        <input type="checkbox" data-online-product="${escapeHtmlAttr(p.id)}" ${isProductPublished(p.id) ? 'checked' : ''}>
+        <span class="pg3-onlineProductInfo">
+          <strong>${escapeHtml(p.name || 'Producto')}</strong>
+          <small>${escapeHtml(normalizeCat(p.category))} · Stock ${Number(p.stock||0)} · SKU ${escapeHtml(p.sku || '—')}</small>
+        </span>
+        <span class="pg3-onlineProductPrice">${money(p.price)}</span>
+      </label>
+    `).join('');
+    els.onlineProductsList.querySelectorAll('[data-online-product]').forEach(chk=>{
+      chk.addEventListener('change', ()=>{
+        const id = String(chk.dataset.onlineProduct || '');
+        const current = new Set(publishedIds());
+        if(chk.checked) current.add(id);
+        else current.delete(id);
+        state.onlineProductIds = Array.from(current);
+        // Si la categoría actual quedó sin productos visibles, limpiamos el filtro para no mostrar una pantalla vacía accidental.
+        if(state.selectedCategory && !productsByCategory(state.selectedCategory).length){
+          state.selectedCategory = '';
+          if(state.route === 'categoria') state.route = 'tienda';
+        }
+        // Si hay productos ocultos en carrito, los quitamos para que no se pidan online.
+        state.cart = cartItems().filter(item => current.has(String(item.id)));
+        renderOnlineProductsList();
+        renderPreview();
+        saveState();
+      });
+    });
   }
 
   function categories(){
@@ -412,7 +519,8 @@
     return `
       <section class="pg3-panel">
         <h3>Tienda</h3>
-        <p>Catálogo conectado a productos reales de la TPV con buscador y filtro activo.</p>
+        <p>Catálogo conectado a los productos seleccionados para venta online.</p>
+        <div class="pg3-webStatus">Productos publicados: ${allProducts().length} de ${rawProducts().length}</div>
         <div class="pg3-tools">
           <input class="pg3-search" type="text" value="${escapeHtmlAttr(state.search || '')}" placeholder="Buscar producto..." data-preview-search>
           <div class="pg3-cats">
@@ -465,8 +573,10 @@
             <dt>Categoría</dt><dd>${escapeHtml(normalizeCat(p.category))}</dd>
           </dl>
           <div class="pg3-detailActions">
+            <button type="button" class="btn" data-add-cart="${escapeHtmlAttr(p.id)}">Agregar</button>
+            <button type="button" class="btn ghost" data-product-wa="${escapeHtmlAttr(p.id)}">WhatsApp</button>
             <button type="button" class="btn ghost" data-preview-route="categoria" data-category="${escapeHtmlAttr(normalizeCat(p.category))}">Ver categoría</button>
-            <button type="button" class="btn" data-preview-route="tienda">Volver a tienda</button>
+            <button type="button" class="btn ghost" data-preview-route="tienda">Volver a tienda</button>
           </div>
           <div class="pg3-miniNote">Producto tomado del catálogo real de la TPV.</div>
         </div>
@@ -560,7 +670,7 @@
           <div class="pg3-contactCard"><strong>Teléfono</strong><span>${escapeHtml(state.phone || 'Sin definir')}</span></div>
           <div class="pg3-contactCard"><strong>Dirección</strong><span>${escapeHtml(state.address || 'Sin definir')}</span></div>
           <div class="pg3-contactCard"><strong>Horario</strong><span>${escapeHtml(state.hours || 'Sin definir')}</span></div>
-          <div class="pg3-contactCard"><strong>Cobertura</strong><span>${allProducts().length} productos · ${categories().length} categorías</span></div>
+          <div class="pg3-contactCard"><strong>Cobertura web</strong><span>${allProducts().length} productos publicados · ${categories().length} categorías</span></div>
         </div>
         <div class="pg3-contactActions">
           ${state.maps ? `<a class="btn ghost" href="${escapeHtmlAttr(state.maps)}" target="_blank" rel="noopener">Google Maps</a>` : ''}
@@ -571,7 +681,7 @@
   }
 
   function renderFooter(){
-    return `<footer class="pg3-footer">Página 3.0 · Render modular con tienda, producto y contacto reforzado.</footer>`;
+    return `<footer class="pg3-footer">Página 3.0 · Catálogo online con productos seleccionables.</footer>`;
   }
 
   function money(v){

@@ -50,3 +50,18 @@
 .pg3-productMedia--detail{height:280px}
 .pg3-productImg{width:100%;height:100%;display:block;object-fit:contain;background:#fff}
 .pg3-productPlaceholder{display:grid;place-items:center;width:100%;height:100%;min-height:112px;color:#9b0000;font-weight:700;background:linear-gradient(135deg,#fff1f1,#f6f6f6)}
+
+
+/* Página 3.0 - productos visibles en web */
+.pg3-helpText{margin:0;color:#666;font-size:12px;line-height:1.4}
+.pg3-miniActions{display:flex;gap:8px;flex-wrap:wrap}
+.pg3-onlineProductsSummary{font-size:12px;font-weight:800;color:#9b0000;background:#fff1f1;border:1px solid #f0b0b0;border-radius:999px;padding:7px 10px;width:max-content;max-width:100%}
+.pg3-onlineProductsList{display:grid;gap:8px;max-height:280px;overflow:auto;border:1px solid #eee;border-radius:14px;background:#fafafa;padding:8px}
+.pg3-onlineProductRow{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;background:#fff;border:1px solid #eee;border-radius:12px;padding:8px}
+.pg3-onlineProductRow input{width:18px;height:18px;accent-color:#c00000}
+.pg3-onlineProductInfo{min-width:0;display:grid;gap:2px}
+.pg3-onlineProductInfo strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg3-onlineProductInfo small{font-size:11px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg3-onlineProductPrice{font-size:12px;font-weight:800;color:#111;white-space:nowrap}
+.pg3-onlineProductEmpty{padding:12px;border:1px dashed #e7d1d1;border-radius:12px;background:#fff;color:#777;font-size:12px}
+.pg3-webStatus{font-size:12px;color:#666;margin-top:6px}

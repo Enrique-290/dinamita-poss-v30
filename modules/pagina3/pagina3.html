@@ -5,8 +5,8 @@
       <p>Render funcional por módulos con rutas base para una web real.</p>
     </div>
     <div class="pg3-badges">
-      <span class="pg3-badge">V30.4</span>
-      <span class="pg3-badge pg3-badge--soft">Carrito modular</span>
+      <span class="pg3-badge">V30.5.4</span>
+      <span class="pg3-badge pg3-badge--soft">Productos web seleccionables</span>
     </div>
   </header>
 
@@ -69,6 +69,20 @@
       <div class="pg3-actions">
         <button id="pg3-saveBtn" class="btn" type="button">Guardar</button>
         <button id="pg3-resetBtn" class="btn ghost" type="button">Restablecer</button>
+      </div>
+
+
+
+      <div class="pg3-section pg3-onlineProductsSection">
+        <h4>Productos para web</h4>
+        <p class="pg3-helpText">Elige qué productos del inventario se publican en Página 3.0. Los no marcados no salen en tienda, categorías ni carrito.</p>
+        <input id="pg3-onlineProductSearch" class="input" placeholder="Buscar producto para publicar...">
+        <div class="pg3-miniActions">
+          <button id="pg3-selectAllProducts" class="btn ghost" type="button">Seleccionar todos</button>
+          <button id="pg3-clearProducts" class="btn ghost" type="button">Ocultar todos</button>
+        </div>
+        <div id="pg3-onlineProductsSummary" class="pg3-onlineProductsSummary">0 productos visibles</div>
+        <div id="pg3-onlineProductsList" class="pg3-onlineProductsList"></div>
       </div>
 
       <div class="pg3-section">
