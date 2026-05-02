@@ -20,111 +20,118 @@
         <button type="button" class="btn ghost" data-route="producto">Producto</button>
       </nav>
 
-      <!-- Herramientas principales visibles arriba -->
-      <div class="pg3-section pg3-onlineProductsSection pg3-prioritySection">
-        <h4>Productos para web</h4>
-        <p class="pg3-helpText">Elige qué productos del inventario se publican en Página 3.0. Los no marcados no salen en tienda, categorías ni carrito.</p>
-        <input id="pg3-onlineProductSearch" class="input" placeholder="Buscar producto para publicar...">
-        <div class="pg3-miniActions">
-          <button id="pg3-selectAllProducts" class="btn ghost" type="button">Seleccionar todos</button>
-          <button id="pg3-clearProducts" class="btn ghost" type="button">Ocultar todos</button>
+      <nav id="pg3-editorTabs" class="pg3-editorTabs" aria-label="Editor Página 3.0">
+        <button type="button" class="active" data-tab="design">Diseño</button>
+        <button type="button" data-tab="products">Productos</button>
+        <button type="button" data-tab="contact">Contacto</button>
+        <button type="button" data-tab="export">Exportar</button>
+      </nav>
+
+      <div class="pg3-tabPane active" data-tab-pane="design">
+        <div class="pg3-section">
+          <h4>General</h4>
+          <label>Nombre del negocio</label>
+          <input id="pg3-businessName" class="input" placeholder="Dinamita Gym">
+          <label>Título principal</label>
+          <input id="pg3-heroTitle" class="input" placeholder="Explota tu potencial">
+          <label>Subtítulo</label>
+          <textarea id="pg3-heroSubtitle" class="input" rows="3" placeholder="Tu tienda y sistema conectados."></textarea>
         </div>
-        <div id="pg3-onlineProductsSummary" class="pg3-onlineProductsSummary">0 productos visibles</div>
-        <div id="pg3-onlineProductsList" class="pg3-onlineProductsList"></div>
-      </div>
 
-      <div class="pg3-section pg3-exportSection pg3-prioritySection">
-        <h4>Exportación</h4>
-        <p class="pg3-helpText">Descarga la página con los productos visibles para web. La exportación respeta los productos ocultos.</p>
-        <div class="pg3-exportActions">
-          <button id="pg3-downloadHtml" class="btn" type="button">Descargar página HTML</button>
-          <button id="pg3-downloadZip" class="btn" type="button">Descargar ZIP web</button>
-          <button id="pg3-downloadJson" class="btn ghost" type="button">Descargar JSON</button>
-          <label class="btn ghost pg3-uploadJsonLabel" for="pg3-uploadJson">Subir JSON</label>
-          <input id="pg3-uploadJson" type="file" accept="application/json,.json" hidden>
+        <div class="pg3-section">
+          <h4>Banners</h4>
+          <label>Banner principal</label>
+          <input id="pg3-bannerPrimaryFile" type="file" accept="image/*" class="input">
+          <div class="pg3-bannerPreviewWrap"><img id="pg3-bannerPrimaryPreview" class="pg3-bannerPreview" alt="Banner principal"></div>
+          <button id="pg3-bannerPrimaryClear" class="btn ghost" type="button">Quitar banner principal</button>
+          <label>Banner secundario</label>
+          <input id="pg3-bannerSecondaryFile" type="file" accept="image/*" class="input">
+          <div class="pg3-bannerPreviewWrap"><img id="pg3-bannerSecondaryPreview" class="pg3-bannerPreview" alt="Banner secundario"></div>
+          <button id="pg3-bannerSecondaryClear" class="btn ghost" type="button">Quitar banner secundario</button>
         </div>
-        <div id="pg3-exportStatus" class="pg3-exportStatus">Listo para exportar.</div>
-      </div>
 
-
-      <div class="pg3-section">
-        <h4>General</h4>
-        <label>Nombre del negocio</label>
-        <input id="pg3-businessName" class="input" placeholder="Dinamita Gym">
-        <label>Título principal</label>
-        <input id="pg3-heroTitle" class="input" placeholder="Explota tu potencial">
-        <label>Subtítulo</label>
-        <textarea id="pg3-heroSubtitle" class="input" rows="3" placeholder="Tu tienda y sistema conectados."></textarea>
-      </div>
-
-      <div class="pg3-section">
-        <h4>Banners</h4>
-        <label>Banner principal</label>
-        <input id="pg3-bannerPrimaryFile" type="file" accept="image/*" class="input">
-        <div class="pg3-bannerPreviewWrap"><img id="pg3-bannerPrimaryPreview" class="pg3-bannerPreview" alt="Banner principal"></div>
-        <button id="pg3-bannerPrimaryClear" class="btn ghost" type="button">Quitar banner principal</button>
-        <label>Banner secundario</label>
-        <input id="pg3-bannerSecondaryFile" type="file" accept="image/*" class="input">
-        <div class="pg3-bannerPreviewWrap"><img id="pg3-bannerSecondaryPreview" class="pg3-bannerPreview" alt="Banner secundario"></div>
-        <button id="pg3-bannerSecondaryClear" class="btn ghost" type="button">Quitar banner secundario</button>
-      </div>
-
-      <div class="pg3-section">
-        <h4>Contacto base</h4>
-        <label>Teléfono</label>
-        <input id="pg3-phone" class="input" placeholder="5512345678">
-        <label>Dirección</label>
-        <textarea id="pg3-address" class="input" rows="2" placeholder="Dirección del negocio"></textarea>
-        <label>Horario</label>
-        <input id="pg3-hours" class="input" placeholder="Lun a Vie 6:00 am - 10:00 pm">
-        <label>Google Maps</label>
-        <input id="pg3-maps" class="input" placeholder="https://maps.google.com/...">
-        <label>Facebook</label>
-        <input id="pg3-facebook" class="input" placeholder="https://facebook.com/...">
-        <label>Instagram</label>
-        <input id="pg3-instagram" class="input" placeholder="https://instagram.com/...">
-      </div>
-
-      <div class="pg3-section">
-        <h4>Visualización</h4>
-        <label>Color principal</label>
-        <div class="pg3-colorControl">
-          <input id="pg3-primaryColor" type="color" value="#d7192a" aria-label="Color principal">
-          <input id="pg3-primaryColorText" class="input" placeholder="#d7192a">
+        <div class="pg3-section">
+          <h4>Visualización</h4>
+          <label>Color principal</label>
+          <div class="pg3-colorControl">
+            <input id="pg3-primaryColor" type="color" value="#d7192a" aria-label="Color principal">
+            <input id="pg3-primaryColorText" class="input" placeholder="#d7192a">
+          </div>
+          <div class="pg3-toggleGrid">
+            <label class="pg3-check"><input id="pg3-showPrices" type="checkbox"> Mostrar precios</label>
+            <label class="pg3-check"><input id="pg3-showStock" type="checkbox"> Mostrar stock</label>
+            <label class="pg3-check"><input id="pg3-showSku" type="checkbox"> Mostrar SKU</label>
+          </div>
+          <label>Texto botón WhatsApp</label>
+          <input id="pg3-whatsappLabel" class="input" placeholder="Enviar pedido por WhatsApp">
+          <label>Límite catálogo</label>
+          <input id="pg3-limitCatalog" class="input" type="number" min="4" max="60" step="1" placeholder="8">
+          <label>Búsqueda inicial</label>
+          <input id="pg3-search" class="input" placeholder="Buscar producto...">
         </div>
-        <div class="pg3-toggleGrid">
-          <label class="pg3-check"><input id="pg3-showPrices" type="checkbox"> Mostrar precios</label>
-          <label class="pg3-check"><input id="pg3-showStock" type="checkbox"> Mostrar stock</label>
-          <label class="pg3-check"><input id="pg3-showSku" type="checkbox"> Mostrar SKU</label>
+
+        <div class="pg3-actions">
+          <button id="pg3-saveBtn" class="btn" type="button">Guardar</button>
+          <button id="pg3-resetBtn" class="btn ghost" type="button">Restablecer</button>
         </div>
-        <label>Texto botón WhatsApp</label>
-        <input id="pg3-whatsappLabel" class="input" placeholder="Enviar pedido por WhatsApp">
-        <label>Límite catálogo</label>
-        <input id="pg3-limitCatalog" class="input" type="number" min="4" max="60" step="1" placeholder="8">
-        <label>Búsqueda inicial</label>
-        <input id="pg3-search" class="input" placeholder="Buscar producto...">
       </div>
 
-      <div class="pg3-actions">
-        <button id="pg3-saveBtn" class="btn" type="button">Guardar</button>
-        <button id="pg3-resetBtn" class="btn ghost" type="button">Restablecer</button>
+      <div class="pg3-tabPane" data-tab-pane="products">
+        <div class="pg3-section pg3-onlineProductsSection pg3-prioritySection">
+          <h4>Productos para web</h4>
+          <p class="pg3-helpText">Elige qué productos del inventario se publican en Página 3.0. Los no marcados no salen en tienda, categorías ni carrito.</p>
+          <input id="pg3-onlineProductSearch" class="input" placeholder="Buscar producto para publicar...">
+          <div class="pg3-miniActions">
+            <button id="pg3-selectAllProducts" class="btn ghost" type="button">Seleccionar todos</button>
+            <button id="pg3-clearProducts" class="btn ghost" type="button">Ocultar todos</button>
+          </div>
+          <div id="pg3-onlineProductsSummary" class="pg3-onlineProductsSummary">0 productos visibles</div>
+          <div id="pg3-onlineProductsList" class="pg3-onlineProductsList"></div>
+        </div>
       </div>
 
+      <div class="pg3-tabPane" data-tab-pane="contact">
+        <div class="pg3-section">
+          <h4>Contacto base</h4>
+          <label>Teléfono</label>
+          <input id="pg3-phone" class="input" placeholder="5512345678">
+          <label>Dirección</label>
+          <textarea id="pg3-address" class="input" rows="2" placeholder="Dirección del negocio"></textarea>
+          <label>Horario</label>
+          <input id="pg3-hours" class="input" placeholder="Lun a Vie 6:00 am - 10:00 pm">
+          <label>Google Maps</label>
+          <input id="pg3-maps" class="input" placeholder="https://maps.google.com/...">
+          <label>Facebook</label>
+          <input id="pg3-facebook" class="input" placeholder="https://facebook.com/...">
+          <label>Instagram</label>
+          <input id="pg3-instagram" class="input" placeholder="https://instagram.com/...">
+        </div>
+      </div>
 
+      <div class="pg3-tabPane" data-tab-pane="export">
+        <div class="pg3-section pg3-exportSection pg3-prioritySection">
+          <h4>Exportación</h4>
+          <p class="pg3-helpText">Descarga la página con los productos visibles para web. La exportación respeta los productos ocultos.</p>
+          <div class="pg3-exportActions">
+            <button id="pg3-downloadHtml" class="btn" type="button">Descargar página HTML</button>
+            <button id="pg3-downloadZip" class="btn" type="button">Descargar ZIP web</button>
+            <button id="pg3-downloadJson" class="btn ghost" type="button">Descargar JSON</button>
+            <label class="btn ghost pg3-uploadJsonLabel" for="pg3-uploadJson">Subir JSON</label>
+            <input id="pg3-uploadJson" type="file" accept="application/json,.json" hidden>
+          </div>
+          <div id="pg3-exportStatus" class="pg3-exportStatus">Listo para exportar.</div>
+        </div>
 
-
-
-
-
-      <div class="pg3-section">
-        <h4>Estructura activa</h4>
-        <ul class="pg3-tree">
-          <li>Header</li>
-          <li>Hero</li>
-          <li>Inicio / Tienda / Categoría / Producto</li>
-          <li>Contacto</li>
-          <li>Footer</li>
-        </ul>
+        <div class="pg3-section">
+          <h4>Estructura activa</h4>
+          <ul class="pg3-tree">
+            <li>Header</li>
+            <li>Hero</li>
+            <li>Inicio / Tienda / Categoría / Producto</li>
+            <li>Contacto</li>
+            <li>Footer</li>
+          </ul>
+        </div>
       </div>
     </aside>
 

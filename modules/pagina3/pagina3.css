@@ -83,6 +83,11 @@
 
 
 /* Controles de diseño Página 3.0 */
+.pg3-editorTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#f7f7f8;border:1px solid #eee;border-radius:14px;padding:6px}
+.pg3-editorTabs button{border:1px solid transparent;background:transparent;color:#555;border-radius:10px;padding:9px 8px;font-size:12px;font-weight:900;cursor:pointer}
+.pg3-editorTabs button.active{background:#fff;color:#9b0000;border-color:#f0b0b0;box-shadow:0 6px 14px rgba(16,24,40,.08)}
+.pg3-tabPane{display:none;gap:16px}
+.pg3-tabPane.active{display:grid}
 .pg3-colorControl{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center}
 .pg3-colorControl input[type="color"]{width:52px;height:42px;border:1px solid #e5bcbc;border-radius:12px;background:#fff;padding:4px}
 .pg3-toggleGrid{display:grid;gap:8px}

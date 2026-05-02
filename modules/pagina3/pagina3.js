@@ -27,6 +27,7 @@
     showSku: true,
     whatsappLabel: 'Enviar pedido por WhatsApp',
     previewDevice: 'desktop',
+    editorTab: 'design',
     onlineProductIds: null,
     onlineProductSearch: '',
     cart: []
@@ -58,6 +59,7 @@
     showSku: document.getElementById('pg3-showSku'),
     whatsappLabel: document.getElementById('pg3-whatsappLabel'),
     previewDevice: document.getElementById('pg3-previewDevice'),
+    editorTabs: document.getElementById('pg3-editorTabs'),
     onlineProductSearch: document.getElementById('pg3-onlineProductSearch'),
     onlineProductsList: document.getElementById('pg3-onlineProductsList'),
     onlineProductsSummary: document.getElementById('pg3-onlineProductsSummary'),
@@ -93,6 +95,7 @@
         showSku: parsed.showSku !== false,
         whatsappLabel: parsed.whatsappLabel || defaults.whatsappLabel,
         previewDevice: parsed.previewDevice === 'mobile' ? 'mobile' : 'desktop',
+        editorTab: ['design','products','contact','export'].includes(parsed.editorTab) ? parsed.editorTab : 'design',
         onlineProductIds: Array.isArray(parsed.onlineProductIds) ? parsed.onlineProductIds : null,
         onlineProductSearch: parsed.onlineProductSearch || '',
         cart: Array.isArray(parsed.cart) ? parsed.cart : []
@@ -128,6 +131,7 @@
     if(els.showSku) els.showSku.checked = state.showSku !== false;
     if(els.whatsappLabel) els.whatsappLabel.value = state.whatsappLabel || defaults.whatsappLabel;
     syncPreviewDeviceButtons();
+    syncEditorTabs();
     if(els.onlineProductSearch) els.onlineProductSearch.value = state.onlineProductSearch || '';
     syncRouteButtons();
     renderOnlineProductsList();
@@ -153,6 +157,7 @@
     bindCheckbox(els.showSku, 'showSku');
     bindInput(els.whatsappLabel, 'whatsappLabel');
     bindPreviewDevice();
+    bindEditorTabs();
     els.limitCatalog.addEventListener('input', e=>{
       const n = Number(e.target.value || 8);
       state.limitCatalog = Math.max(4, Math.min(60, n));
@@ -238,6 +243,17 @@
     });
   }
 
+  function bindEditorTabs(){
+    if(!els.editorTabs) return;
+    els.editorTabs.querySelectorAll('[data-tab]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.editorTab = btn.dataset.tab || 'design';
+        syncEditorTabs();
+        saveState();
+      });
+    });
+  }
+
   function bindImageInput(el, key, previewEl){
     if(!el) return;
     el.addEventListener('change', e=>{
@@ -278,6 +294,19 @@
     if(!els.previewDevice) return;
     els.previewDevice.querySelectorAll('[data-device]').forEach(btn=>{
       btn.classList.toggle('active', btn.dataset.device === state.previewDevice);
+    });
+  }
+
+  function syncEditorTabs(){
+    const current = ['design','products','contact','export'].includes(state.editorTab) ? state.editorTab : 'design';
+    state.editorTab = current;
+    if(els.editorTabs){
+      els.editorTabs.querySelectorAll('[data-tab]').forEach(btn=>{
+        btn.classList.toggle('active', btn.dataset.tab === current);
+      });
+    }
+    document.querySelectorAll('[data-tab-pane]').forEach(pane=>{
+      pane.classList.toggle('active', pane.dataset.tabPane === current);
     });
   }
 
