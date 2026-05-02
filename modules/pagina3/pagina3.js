@@ -1,4 +1,4 @@
-(function(){
+﻿(function(){
   const STORAGE_KEY = 'dp_pagina3_state';
 
   const st = (typeof dpGetState === 'function') ? dpGetState() : { config:{business:{}}, products:[] };
@@ -1007,3 +1007,6 @@
     return escapeHtml(v).replace(/`/g,'&#96;');
   }
 })();
+
+
+

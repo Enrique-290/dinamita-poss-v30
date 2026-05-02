@@ -1,4 +1,4 @@
- .pg3-shell{padding:16px;display:flex;flex-direction:column;gap:16px}
+﻿ .pg3-shell{padding:16px;display:flex;flex-direction:column;gap:16px}
 .pg3-topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:#fff;border:1px solid #eee;border-radius:18px;padding:18px 20px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
 .pg3-topbar h1{margin:0 0 6px;font-size:24px}.pg3-topbar p{margin:0;color:#666}
 .pg3-badges{display:flex;gap:8px;flex-wrap:wrap}.pg3-badge{background:#c00000;color:#fff;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px}.pg3-badge--soft{background:#fff1f1;color:#9b0000;border:1px solid #f2b4b4}
@@ -80,3 +80,6 @@
 .pg3-prioritySection h4{color:#9b0000;display:flex;align-items:center;gap:6px}
 .pg3-prioritySection h4::before{content:'●';font-size:10px;color:#c00000}
 .pg3-exportActions .btn{width:100%;justify-content:center}
+
+
+
