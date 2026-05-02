@@ -4,6 +4,12 @@
   const st = (typeof dpGetState === 'function') ? dpGetState() : { config:{business:{}}, products:[] };
   const cfg = (typeof dpGetConfig === 'function') ? dpGetConfig() : (st?.config || {});
   const business = cfg?.business || st?.config?.business || st?.meta?.business || {};
+  const THEME_PRESETS = {
+    dinamita: { color: '#d7192a' },
+    premium: { color: '#15171c' },
+    sport: { color: '#2563eb' },
+    health: { color: '#16a34a' }
+  };
   const defaults = {
     businessName: business.name || 'Dinamita Gym',
     heroTitle: 'Explota tu potencial',
@@ -22,6 +28,7 @@
     limitCatalog: 8,
     search: '',
     primaryColor: '#d7192a',
+    themePreset: 'dinamita',
     showPrices: true,
     showStock: true,
     showSku: true,
@@ -54,6 +61,7 @@
     search: document.getElementById('pg3-search'),
     primaryColor: document.getElementById('pg3-primaryColor'),
     primaryColorText: document.getElementById('pg3-primaryColorText'),
+    themePresets: document.getElementById('pg3-themePresets'),
     showPrices: document.getElementById('pg3-showPrices'),
     showStock: document.getElementById('pg3-showStock'),
     showSku: document.getElementById('pg3-showSku'),
@@ -90,6 +98,7 @@
         ...defaults,
         ...parsed,
         primaryColor: sanitizeColor(parsed.primaryColor || defaults.primaryColor),
+        themePreset: THEME_PRESETS[parsed.themePreset] ? parsed.themePreset : detectThemePreset(parsed.primaryColor || defaults.primaryColor),
         showPrices: parsed.showPrices !== false,
         showStock: parsed.showStock !== false,
         showSku: parsed.showSku !== false,
@@ -126,6 +135,7 @@
     els.search.value = state.search || '';
     if(els.primaryColor) els.primaryColor.value = sanitizeColor(state.primaryColor);
     if(els.primaryColorText) els.primaryColorText.value = sanitizeColor(state.primaryColor);
+    syncThemePresetButtons();
     if(els.showPrices) els.showPrices.checked = state.showPrices !== false;
     if(els.showStock) els.showStock.checked = state.showStock !== false;
     if(els.showSku) els.showSku.checked = state.showSku !== false;
@@ -152,6 +162,7 @@
     bindInput(els.facebook, 'facebook');
     bindInput(els.instagram, 'instagram');
     bindColorInputs();
+    bindThemePresets();
     bindCheckbox(els.showPrices, 'showPrices');
     bindCheckbox(els.showStock, 'showStock');
     bindCheckbox(els.showSku, 'showSku');
@@ -219,8 +230,10 @@
   function bindColorInputs(){
     const apply = value => {
       state.primaryColor = sanitizeColor(value);
+      state.themePreset = detectThemePreset(state.primaryColor);
       if(els.primaryColor) els.primaryColor.value = state.primaryColor;
       if(els.primaryColorText) els.primaryColorText.value = state.primaryColor;
+      syncThemePresetButtons();
       renderPreview();
       saveState();
     };
@@ -228,6 +241,23 @@
     if(els.primaryColorText) els.primaryColorText.addEventListener('input', e=>{
       const value = String(e.target.value || '').trim();
       if(/^#[0-9a-fA-F]{6}$/.test(value)) apply(value);
+    });
+  }
+
+  function bindThemePresets(){
+    if(!els.themePresets) return;
+    els.themePresets.querySelectorAll('[data-theme]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.dataset.theme;
+        const preset = THEME_PRESETS[key] || THEME_PRESETS.dinamita;
+        state.themePreset = key;
+        state.primaryColor = sanitizeColor(preset.color);
+        if(els.primaryColor) els.primaryColor.value = state.primaryColor;
+        if(els.primaryColorText) els.primaryColorText.value = state.primaryColor;
+        syncThemePresetButtons();
+        renderPreview();
+        saveState();
+      });
     });
   }
 
@@ -294,6 +324,15 @@
     if(!els.previewDevice) return;
     els.previewDevice.querySelectorAll('[data-device]').forEach(btn=>{
       btn.classList.toggle('active', btn.dataset.device === state.previewDevice);
+    });
+  }
+
+  function syncThemePresetButtons(){
+    if(!els.themePresets) return;
+    const current = THEME_PRESETS[state.themePreset] ? state.themePreset : detectThemePreset(state.primaryColor);
+    state.themePreset = current;
+    els.themePresets.querySelectorAll('[data-theme]').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.theme === current);
     });
   }
 
@@ -821,6 +860,7 @@
         instagram: state.instagram,
         limitCatalog: state.limitCatalog,
         primaryColor: sanitizeColor(state.primaryColor),
+        themePreset: state.themePreset || detectThemePreset(state.primaryColor),
         showPrices: state.showPrices !== false,
         showStock: state.showStock !== false,
         showSku: state.showSku !== false,
@@ -887,6 +927,7 @@
           instagram: imported.instagram || state.instagram,
           limitCatalog: imported.limitCatalog || state.limitCatalog,
           primaryColor: sanitizeColor(imported.primaryColor || state.primaryColor),
+          themePreset: THEME_PRESETS[imported.themePreset] ? imported.themePreset : detectThemePreset(imported.primaryColor || state.primaryColor),
           showPrices: imported.showPrices !== false,
           showStock: imported.showStock !== false,
           showSku: imported.showSku !== false,
@@ -1123,6 +1164,12 @@
   function sanitizeColor(value){
     const raw = String(value || '').trim();
     return /^#[0-9a-fA-F]{6}$/.test(raw) ? raw.toLowerCase() : '#d7192a';
+  }
+
+  function detectThemePreset(color){
+    const value = sanitizeColor(color);
+    const found = Object.entries(THEME_PRESETS).find(([, preset]) => sanitizeColor(preset.color) === value);
+    return found ? found[0] : 'custom';
   }
 
   function routeName(route){
