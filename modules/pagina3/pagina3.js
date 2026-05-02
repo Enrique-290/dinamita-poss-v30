@@ -16,6 +16,14 @@
     heroSubtitle: 'Página 3.0 ahora ya se comporta como una web real con tienda, categoría y producto.',
     bannerPrimary: '',
     bannerSecondary: '',
+    categoriesTitle: 'Categorías',
+    categoriesText: 'Explora el catálogo por tipo de producto.',
+    featuredTitle: 'Productos destacados',
+    featuredText: 'Selección publicada desde Dinamita POS.',
+    shopTitle: 'Tienda',
+    contactTitle: 'Contacto',
+    contactText: 'Base de contacto reforzada para una página real del negocio.',
+    footerText: 'Página generada por Dinamita POS',
     phone: business.phone || '',
     address: business.address || '',
     hours: '',
@@ -52,6 +60,13 @@
     bannerSecondaryFile: document.getElementById('pg3-bannerSecondaryFile'),
     bannerSecondaryPreview: document.getElementById('pg3-bannerSecondaryPreview'),
     bannerSecondaryClear: document.getElementById('pg3-bannerSecondaryClear'),
+    categoriesTitle: document.getElementById('pg3-categoriesTitle'),
+    categoriesText: document.getElementById('pg3-categoriesText'),
+    featuredTitle: document.getElementById('pg3-featuredTitle'),
+    featuredText: document.getElementById('pg3-featuredText'),
+    contactTitle: document.getElementById('pg3-contactTitle'),
+    contactText: document.getElementById('pg3-contactText'),
+    footerText: document.getElementById('pg3-footerText'),
     phone: document.getElementById('pg3-phone'),
     address: document.getElementById('pg3-address'),
     hours: document.getElementById('pg3-hours'),
@@ -128,6 +143,13 @@
     els.heroSubtitle.value = state.heroSubtitle || '';
     setBannerPreview(els.bannerPrimaryPreview, state.bannerPrimary);
     setBannerPreview(els.bannerSecondaryPreview, state.bannerSecondary);
+    if(els.categoriesTitle) els.categoriesTitle.value = state.categoriesTitle || defaults.categoriesTitle;
+    if(els.categoriesText) els.categoriesText.value = state.categoriesText || defaults.categoriesText;
+    if(els.featuredTitle) els.featuredTitle.value = state.featuredTitle || defaults.featuredTitle;
+    if(els.featuredText) els.featuredText.value = state.featuredText || defaults.featuredText;
+    if(els.contactTitle) els.contactTitle.value = state.contactTitle || defaults.contactTitle;
+    if(els.contactText) els.contactText.value = state.contactText || defaults.contactText;
+    if(els.footerText) els.footerText.value = state.footerText || defaults.footerText;
     els.phone.value = state.phone || '';
     els.address.value = state.address || '';
     els.hours.value = state.hours || '';
@@ -159,6 +181,13 @@
     bindImageInput(els.bannerSecondaryFile, 'bannerSecondary', els.bannerSecondaryPreview);
     els.bannerPrimaryClear.addEventListener('click', ()=>{ state.bannerPrimary=''; if(els.bannerPrimaryFile) els.bannerPrimaryFile.value=''; setBannerPreview(els.bannerPrimaryPreview,''); renderPreview(); saveState(); });
     els.bannerSecondaryClear.addEventListener('click', ()=>{ state.bannerSecondary=''; if(els.bannerSecondaryFile) els.bannerSecondaryFile.value=''; setBannerPreview(els.bannerSecondaryPreview,''); renderPreview(); saveState(); });
+    bindInput(els.categoriesTitle, 'categoriesTitle');
+    bindInput(els.categoriesText, 'categoriesText');
+    bindInput(els.featuredTitle, 'featuredTitle');
+    bindInput(els.featuredText, 'featuredText');
+    bindInput(els.contactTitle, 'contactTitle');
+    bindInput(els.contactText, 'contactText');
+    bindInput(els.footerText, 'footerText');
     bindInput(els.phone, 'phone');
     bindInput(els.address, 'address');
     bindInput(els.hours, 'hours');
@@ -461,6 +490,10 @@
     return String(v||'General').trim() || 'General';
   }
 
+  function sectionText(key){
+    return String(state[key] || defaults[key] || '').trim();
+  }
+
   function featuredProducts(){
     return filteredProducts().slice(0, Math.max(1, Number(state.limitCatalog||8)));
   }
@@ -686,13 +719,15 @@
         <p>Home base conectado a tu catálogo real de la TPV.</p>
       </section>
       <section class="pg3-panel">
-        <h3>Categorías detectadas</h3>
+        <h3>${escapeHtml(sectionText('categoriesTitle'))}</h3>
+        <p>${escapeHtml(sectionText('categoriesText'))}</p>
         <div class="pg3-cats">
           ${cats.length ? cats.map(cat=> `<button type="button" class="pg3-pill" data-preview-route="categoria" data-category="${escapeHtmlAttr(cat)}">${escapeHtml(cat)}</button>`).join('') : '<div class="pg3-empty">No hay categorías todavía.</div>'}
         </div>
       </section>
       <section class="pg3-panel">
-        <h3>Productos destacados</h3>
+        <h3>${escapeHtml(sectionText('featuredTitle'))}</h3>
+        <p>${escapeHtml(sectionText('featuredText'))}</p>
         <div class="pg3-products">${featuredProducts().slice(0,4).map(productCard).join('') || '<div class="pg3-empty">No hay productos.</div>'}</div>
       </section>`;
   }
@@ -702,7 +737,7 @@
     const items = filteredProducts().slice(0, Math.max(1, Number(state.limitCatalog||8)));
     return `
       <section class="pg3-panel">
-        <h3>Tienda</h3>
+        <h3>${escapeHtml(sectionText('shopTitle'))}</h3>
         <p>Catálogo conectado a los productos seleccionados para venta online.</p>
         <div class="pg3-webStatus">Productos publicados: ${allProducts().length} de ${rawProducts().length}</div>
         <div class="pg3-tools">
@@ -850,8 +885,8 @@
   function renderContacto(){
     return `
       <section class="pg3-panel">
-        <h3>Contacto</h3>
-        <p>Base de contacto reforzada para una página real del negocio.</p>
+        <h3>${escapeHtml(sectionText('contactTitle'))}</h3>
+        <p>${escapeHtml(sectionText('contactText'))}</p>
         <div class="pg3-contactGrid">
           <div class="pg3-contactCard"><strong>Teléfono</strong><span>${escapeHtml(state.phone || 'Sin definir')}</span></div>
           <div class="pg3-contactCard"><strong>Dirección</strong><span>${escapeHtml(state.address || 'Sin definir')}</span></div>
@@ -867,7 +902,7 @@
   }
 
   function renderFooter(){
-    return `<footer class="pg3-footer">Página 3.0 · Catálogo online con productos seleccionables.</footer>`;
+    return `<footer class="pg3-footer">${escapeHtml(state.businessName || business.name || 'Dinamita Gym')} · ${escapeHtml(sectionText('footerText'))}</footer>`;
   }
 
 
@@ -881,6 +916,14 @@
         heroSubtitle: state.heroSubtitle,
         bannerPrimary: state.bannerPrimary,
         bannerSecondary: state.bannerSecondary,
+        categoriesTitle: sectionText('categoriesTitle'),
+        categoriesText: sectionText('categoriesText'),
+        featuredTitle: sectionText('featuredTitle'),
+        featuredText: sectionText('featuredText'),
+        shopTitle: sectionText('shopTitle'),
+        contactTitle: sectionText('contactTitle'),
+        contactText: sectionText('contactText'),
+        footerText: sectionText('footerText'),
         phone: state.phone,
         address: state.address,
         hours: state.hours,
@@ -949,6 +992,14 @@
           heroSubtitle: imported.heroSubtitle || state.heroSubtitle,
           bannerPrimary: imported.bannerPrimary || state.bannerPrimary,
           bannerSecondary: imported.bannerSecondary || state.bannerSecondary,
+          categoriesTitle: imported.categoriesTitle || state.categoriesTitle,
+          categoriesText: imported.categoriesText || state.categoriesText,
+          featuredTitle: imported.featuredTitle || state.featuredTitle,
+          featuredText: imported.featuredText || state.featuredText,
+          shopTitle: imported.shopTitle || state.shopTitle,
+          contactTitle: imported.contactTitle || state.contactTitle,
+          contactText: imported.contactText || state.contactText,
+          footerText: imported.footerText || state.footerText,
           phone: imported.phone || state.phone,
           address: imported.address || state.address,
           hours: imported.hours || state.hours,
@@ -1062,6 +1113,7 @@
   const showSku = state.showSku !== false;
   const whatsappLabel = state.whatsappLabel || 'Enviar pedido por WhatsApp';
   const productSort = state.productSort || 'manual';
+  function text(key, fallback){ return String(state[key] || fallback || '').trim(); }
   let route = 'inicio';
   let selectedCategory = '';
   let selectedProductId = products[0]?.id || '';
@@ -1085,16 +1137,16 @@
   function card(p){ const meta=esc(cat(p.category))+(showStock?' · Stock '+Number(p.stock||0):''); return '<article class="card"><div class="media">'+img(p)+'</div><div class="cardBody"><small>'+meta+'</small><h3>'+esc(p.name||'Producto')+'</h3>'+(showPrices?'<div class="price">'+money(p.price)+'</div>':'')+'<div class="actions"><button class="btn" data-add="'+attr(p.id)+'">Agregar</button><button class="btn ghost" data-wa="'+attr(p.id)+'">WhatsApp</button><button class="btn ghost" data-prod="'+attr(p.id)+'">Ver</button></div></div></article>'; }
   function header(){ const name=state.businessName||business.name||'Dinamita Gym'; const logo=business.logo ? '<img class="logo" src="'+attr(business.logo)+'" alt="Logo">' : '<div class="logoFallback">'+esc(initials(name))+'</div>'; return '<header class="top"><div class="wrap topIn"><div class="brand">'+logo+'<div><strong>'+esc(name)+'</strong><small>Tienda online</small></div></div><nav class="nav">'+Object.keys(routeNames).map(r=>'<button type="button" class="'+(route===r?'active':'')+'" data-route="'+r+'">'+routeNames[r]+'</button>').join('')+'</nav></div></header>'; }
   function hero(){ return '<div class="wrap"><section class="hero" style="'+(state.bannerPrimary?'background-image:url(\''+attr(state.bannerPrimary)+'\')':'')+'"><div class="heroOverlay"><div class="eyebrow">Catálogo online</div><h1>'+esc(state.heroTitle||'Explota tu potencial')+'</h1><p>'+esc(state.heroSubtitle||'Conoce nuestros productos y promociones.')+'</p><div class="heroActions"><button class="btn" data-route="tienda">Ver tienda</button><button class="btn ghost" data-general-wa>Escríbenos</button></div></div></section>'+(state.bannerSecondary?'<div class="banner2" style="background-image:url(\''+attr(state.bannerSecondary)+'\')"><h2>Promociones y novedades</h2></div>':'')+'</div>'; }
-  function inicio(){ const featured=sortProducts(products).slice(0, Math.max(4, Number(state.limitCatalog||8))); return '<main>'+hero()+'<section class="section wrap"><div class="sectionHead"><div><h2>Categorías</h2><p class="muted">Explora el catálogo por tipo de producto.</p></div><button class="btn ghost" data-route="tienda">Ver todo</button></div><div class="pills">'+(cats().map(c=>'<button class="pill" data-cat="'+attr(c)+'">'+esc(c)+'</button>').join('') || '<div class="empty">No hay categorías disponibles.</div>')+'</div></section><section class="section wrap"><div class="sectionHead"><div><h2>Productos destacados</h2><p class="muted">Selección publicada desde Dinamita POS.</p></div></div><div class="grid">'+(featured.map(card).join('')||'<div class="empty">No hay productos publicados.</div>')+'</div></section></main>'; }
-  function tienda(){ const list=filtered(); return '<main><section class="section wrap"><div class="sectionHead"><div><h2>Tienda</h2><p class="muted">'+list.length+' producto(s) disponibles.</p></div></div><div class="tools"><input class="search" id="q" placeholder="Buscar producto..." value="'+attr(query)+'"><div class="pills"><button class="pill '+(!selectedCategory?'active':'')+'" data-cat="">Todo</button>'+cats().map(c=>'<button class="pill '+(selectedCategory===c?'active':'')+'" data-cat="'+attr(c)+'">'+esc(c)+'</button>').join('')+'</div></div><div class="grid">'+(list.map(card).join('')||'<div class="empty">No hay productos con ese filtro.</div>')+'</div></section></main>'; }
+  function inicio(){ const featured=sortProducts(products).slice(0, Math.max(4, Number(state.limitCatalog||8))); return '<main>'+hero()+'<section class="section wrap"><div class="sectionHead"><div><h2>'+esc(text('categoriesTitle','Categorías'))+'</h2><p class="muted">'+esc(text('categoriesText','Explora el catálogo por tipo de producto.'))+'</p></div><button class="btn ghost" data-route="tienda">Ver todo</button></div><div class="pills">'+(cats().map(c=>'<button class="pill" data-cat="'+attr(c)+'">'+esc(c)+'</button>').join('') || '<div class="empty">No hay categorías disponibles.</div>')+'</div></section><section class="section wrap"><div class="sectionHead"><div><h2>'+esc(text('featuredTitle','Productos destacados'))+'</h2><p class="muted">'+esc(text('featuredText','Selección publicada desde Dinamita POS.'))+'</p></div></div><div class="grid">'+(featured.map(card).join('')||'<div class="empty">No hay productos publicados.</div>')+'</div></section></main>'; }
+  function tienda(){ const list=filtered(); return '<main><section class="section wrap"><div class="sectionHead"><div><h2>'+esc(text('shopTitle','Tienda'))+'</h2><p class="muted">'+list.length+' producto(s) disponibles.</p></div></div><div class="tools"><input class="search" id="q" placeholder="Buscar producto..." value="'+attr(query)+'"><div class="pills"><button class="pill '+(!selectedCategory?'active':'')+'" data-cat="">Todo</button>'+cats().map(c=>'<button class="pill '+(selectedCategory===c?'active':'')+'" data-cat="'+attr(c)+'">'+esc(c)+'</button>').join('')+'</div></div><div class="grid">'+(list.map(card).join('')||'<div class="empty">No hay productos con ese filtro.</div>')+'</div></section></main>'; }
   function categoria(){ if(!selectedCategory) selectedCategory = cats()[0] || ''; return tienda(); }
   function producto(){ const p=products.find(x=>x.id===selectedProductId)||products[0]; if(!p) return '<main class="wrap section"><div class="empty">No hay producto.</div></main>'; const meta=[showStock?'Stock: '+Number(p.stock||0):'',showSku?'SKU: '+esc(p.sku||'—'):''].filter(Boolean).join(' · '); return '<main class="wrap section"><section class="detail"><div class="media">'+img(p)+'</div><div><span class="tag">'+esc(cat(p.category))+'</span><h1>'+esc(p.name)+'</h1><p class="muted">Producto del catálogo online.</p>'+(showPrices?'<h2 class="price">'+money(p.price)+'</h2>':'')+(meta?'<p>'+meta+'</p>':'')+'<div class="actions"><button class="btn" data-add="'+attr(p.id)+'">Agregar</button><button class="btn ghost" data-wa="'+attr(p.id)+'">WhatsApp</button><button class="btn ghost" data-route="tienda">Volver a tienda</button></div></div></section></main>'; }
-  function contact(){ return '<section class="section contact"><div class="wrap"><h2>Contacto</h2><div class="contactGrid"><div class="info"><strong>Teléfono</strong><p>'+esc(state.phone||business.phone||'Sin definir')+'</p></div><div class="info"><strong>Dirección</strong><p>'+esc(state.address||business.address||'Sin definir')+'</p></div><div class="info"><strong>Horario</strong><p>'+esc(state.hours||'Sin definir')+'</p></div></div><div class="actions" style="margin-top:16px">'+(state.maps?'<a class="btn ghost" href="'+attr(state.maps)+'" target="_blank">Google Maps</a>':'')+(state.facebook?'<a class="btn ghost" href="'+attr(state.facebook)+'" target="_blank">Facebook</a>':'')+(state.instagram?'<a class="btn ghost" href="'+attr(state.instagram)+'" target="_blank">Instagram</a>':'')+'</div></div></section>'; }
+  function contact(){ return '<section class="section contact"><div class="wrap"><h2>'+esc(text('contactTitle','Contacto'))+'</h2><p class="muted">'+esc(text('contactText','Base de contacto reforzada para una página real del negocio.'))+'</p><div class="contactGrid"><div class="info"><strong>Teléfono</strong><p>'+esc(state.phone||business.phone||'Sin definir')+'</p></div><div class="info"><strong>Dirección</strong><p>'+esc(state.address||business.address||'Sin definir')+'</p></div><div class="info"><strong>Horario</strong><p>'+esc(state.hours||'Sin definir')+'</p></div></div><div class="actions" style="margin-top:16px">'+(state.maps?'<a class="btn ghost" href="'+attr(state.maps)+'" target="_blank">Google Maps</a>':'')+(state.facebook?'<a class="btn ghost" href="'+attr(state.facebook)+'" target="_blank">Facebook</a>':'')+(state.instagram?'<a class="btn ghost" href="'+attr(state.instagram)+'" target="_blank">Instagram</a>':'')+'</div></div></section>'; }
   function cartDetail(){ return cart.map(i=>{const p=products.find(x=>x.id===i.id); return p?{p,qty:i.qty,sub:Number(p.price||0)*i.qty}:null}).filter(Boolean); }
   function cartTotal(){ return cartDetail().reduce((a,i)=>a+i.sub,0); }
   function cartCount(){ return cart.reduce((a,i)=>a+Number(i.qty||0),0); }
   function cartBox(){ const detail=cartDetail(); return '<button class="cartToggle" data-cart-toggle>Carrito · '+cartCount()+'</button><aside class="cart '+(cartOpen?'open':'')+'"><div class="cartHead"><strong>Carrito</strong><span>'+(showPrices?money(cartTotal()):cartCount()+' pzs')+'</span></div><div class="cartBody">'+(detail.length?detail.map(i=>'<div class="cartItem"><div><strong>'+esc(i.p.name)+'</strong><br><small>'+(showPrices?money(i.sub):'Cantidad '+i.qty)+'</small></div><div class="qty"><button data-delta="-1" data-id="'+attr(i.p.id)+'">-</button><span>'+i.qty+'</span><button data-delta="1" data-id="'+attr(i.p.id)+'">+</button><button data-remove="'+attr(i.p.id)+'">x</button></div></div>').join(''):'<div class="empty">Carrito vacío.</div>')+'</div><div class="cartFoot"><button class="btn ghost" data-clear>Vaciar</button><button class="btn green" data-send>'+esc(whatsappLabel)+'</button></div></aside>'; }
-  function footer(){ return '<footer class="footer">'+esc(state.businessName||business.name||'Dinamita Gym')+' · Página generada por Dinamita POS</footer><button class="floatWa" data-general-wa>WhatsApp</button>'; }
+  function footer(){ return '<footer class="footer">'+esc(state.businessName||business.name||'Dinamita Gym')+' · '+esc(text('footerText','Página generada por Dinamita POS'))+'</footer><button class="floatWa" data-general-wa>WhatsApp</button>'; }
   function render(){ let body = route==='tienda'?tienda():route==='categoria'?categoria():route==='producto'?producto():inicio(); $app.innerHTML = header()+body+contact()+footer()+cartBox(); bind(); }
   function bind(){ document.querySelectorAll('[data-route]').forEach(b=>b.onclick=()=>setRoute(b.dataset.route)); document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const id=b.dataset.add; const it=cart.find(x=>x.id===id); if(it)it.qty++; else cart.push({id,qty:1}); cartOpen=true; render();}); document.querySelectorAll('[data-wa]').forEach(b=>b.onclick=()=>{const p=products.find(x=>x.id===b.dataset.wa); if(p)openWa('Hola, me interesa:\n'+p.name+'\nPrecio: '+money(p.price));}); document.querySelectorAll('[data-prod]').forEach(b=>b.onclick=()=>setRoute('producto',{productId:b.dataset.prod})); document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>setRoute(b.dataset.cat?'categoria':'tienda',{category:b.dataset.cat||''})); const q=document.getElementById('q'); if(q)q.oninput=e=>{query=e.target.value; route='tienda'; tiendaFocusRender();}; document.querySelectorAll('[data-delta]').forEach(b=>b.onclick=()=>{const it=cart.find(x=>x.id===b.dataset.id); if(it){it.qty=Math.max(1,it.qty+Number(b.dataset.delta)); render();}}); document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{cart=cart.filter(x=>x.id!==b.dataset.remove); render();}); const toggle=document.querySelector('[data-cart-toggle]'); if(toggle)toggle.onclick=()=>{cartOpen=!cartOpen; render();}; const cl=document.querySelector('[data-clear]'); if(cl)cl.onclick=()=>{cart=[]; render();}; const send=document.querySelector('[data-send]'); if(send)send.onclick=sendCart; document.querySelectorAll('[data-general-wa]').forEach(b=>b.onclick=()=>openWa('Hola, me interesa información de '+(state.businessName||business.name||'tu negocio'))); }
   function tiendaFocusRender(){ const pos = document.documentElement.scrollTop || document.body.scrollTop; render(); const q=document.getElementById('q'); if(q){q.focus(); q.setSelectionRange(query.length, query.length);} window.scrollTo(0,pos); }
