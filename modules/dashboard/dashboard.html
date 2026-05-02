@@ -1,19 +1,63 @@
-<div class="dp-page">
-  <!-- Barra de estado (mensaje rápido) -->
-  <div class="dp-statusbar" id="dp-statusbar">
-    <div class="dp-statusbar__inner">
-      <span class="dp-statusbar__icon" aria-hidden="true">🔥</span>
-      <span class="dp-statusbar__text" id="dp-status-text">—</span>
+<div class="dp-page dp-dash">
+  <section class="dp-dashHero">
+    <div class="dp-dashHero__copy">
+      <span class="dp-dashHero__eyebrow">Centro de control</span>
+      <h1>Dashboard</h1>
+      <p>Resumen visual de ventas, caja, inventario, membresías y gastos para tomar decisiones rápido.</p>
     </div>
-  </div>
+    <div class="dp-dashHero__status" id="dp-statusbar">
+      <div class="dp-statusbar__inner">
+        <span class="dp-statusbar__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 10-13h-7l0-7Z"/></svg>
+        </span>
+        <span class="dp-statusbar__text" id="dp-status-text">Sin datos todavía</span>
+      </div>
+    </div>
+  </section>
 
-  <div class="dp-page__head">
-    <h1>Dashboard</h1>
-    <div class="dp-page__sub">Resumen general (ventas, inventario, bodega y membresías).</div>
-  </div>
+  <section class="dp-card dp-quickPanel">
+    <div class="dp-quickPanel__head">
+      <div>
+        <div class="dp-sectionTitle">Funciones rápidas</div>
+        <div class="dp-sectionSub">Accesos directos para operar sin buscar en el menú.</div>
+      </div>
+      <button class="dp-btn dp-btn--ghost" id="dp-dash-refresh" type="button">Actualizar</button>
+    </div>
+    <div class="dp-quickActions" id="dp-quick-actions">
+      <button class="dp-quickAction dp-quickAction--red" type="button" data-dash-module="ventas">
+        <span class="dp-quickAction__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 6h14l-2 8H8L7 6Z"/><path d="M7 6 6 3H3"/><path d="M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/><path d="M18 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
+        </span>
+        <span><strong>Nueva venta</strong><small>Abrir punto de venta</small></span>
+      </button>
+      <button class="dp-quickAction dp-quickAction--blue" type="button" data-dash-module="inventario">
+        <span class="dp-quickAction__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v10l9 5 9-5V8Z"/><path d="M12 22V12"/><path d="M21 8l-9 4-9-4"/></svg>
+        </span>
+        <span><strong>Inventario</strong><small>Productos y stock</small></span>
+      </button>
+      <button class="dp-quickAction dp-quickAction--green" type="button" data-dash-module="membresias">
+        <span class="dp-quickAction__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>
+        </span>
+        <span><strong>Membresías</strong><small>Altas y vencimientos</small></span>
+      </button>
+      <button class="dp-quickAction dp-quickAction--amber" type="button" data-dash-module="gastos">
+        <span class="dp-quickAction__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4Z"/><path d="M4 10h16"/><path d="M14 14h6"/><circle cx="8.5" cy="14.5" r="1.5"/></svg>
+        </span>
+        <span><strong>Gastos</strong><small>Registrar salida</small></span>
+      </button>
+      <button class="dp-quickAction dp-quickAction--purple" type="button" data-dash-module="pagina3">
+        <span class="dp-quickAction__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4Z"/><path d="M8 9h8"/><path d="M8 13h5"/><path d="M15 13h1"/></svg>
+        </span>
+        <span><strong>Página 3.0</strong><small>Editar web</small></span>
+      </button>
+    </div>
+  </section>
 
-  <!-- Filtros / rango -->
-  <div class="dp-card dp-filters">
+  <section class="dp-card dp-filters">
     <div class="dp-filters__l">
       <div class="dp-filters__title">Rango</div>
       <div class="dp-filters__chips">
@@ -37,38 +81,37 @@
     </div>
 
     <div class="dp-filters__meta">
-      <span class="dp-pill" id="dp-range-label">—</span>
-      <span class="dp-muted" id="dp-range-hint">—</span>
+      <span class="dp-pill" id="dp-range-label">-</span>
+      <span class="dp-muted" id="dp-range-hint">-</span>
     </div>
-  </div>
+  </section>
 
-  <!-- KPIs (estilo premium como mockup) -->
-  <div class="dp-grid dp-kpisTop" id="dp-kpis-top">
+  <section class="dp-grid dp-kpisTop" id="dp-kpis-top">
     <div class="dp-kpiCard dp-kpiCard--red">
       <div class="dp-kpiCard__head">
-        <div class="dp-kpiCard__icon" aria-hidden="true">🛍️</div>
+        <div class="dp-kpiCard__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M7 15l3-3 3 2 5-6"/></svg></div>
         <div class="dp-kpiCard__meta">
-          <div class="dp-kpiCard__label">Ventas (Rango)</div>
+          <div class="dp-kpiCard__label">Ventas del rango</div>
           <div class="dp-kpiCard__value" id="dp-kpi-sales-range">$0.00</div>
-          <div class="dp-kpiCard__hint" id="dp-kpi-sales-range-hint">—</div>
+          <div class="dp-kpiCard__hint" id="dp-kpi-sales-range-hint">-</div>
         </div>
       </div>
     </div>
 
     <div class="dp-kpiCard dp-kpiCard--green">
       <div class="dp-kpiCard__head">
-        <div class="dp-kpiCard__icon" aria-hidden="true">💰</div>
+        <div class="dp-kpiCard__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"/></svg></div>
         <div class="dp-kpiCard__meta">
-          <div class="dp-kpiCard__label">Utilidad Neta</div>
+          <div class="dp-kpiCard__label">Utilidad neta</div>
           <div class="dp-kpiCard__value" id="dp-kpi-net">$0.00</div>
           <div class="dp-kpiCard__hint" id="dp-kpi-net-hint">Ventas - Gastos</div>
         </div>
       </div>
     </div>
 
-    <div class="dp-kpiCard dp-kpiCard--slate">
+    <div class="dp-kpiCard dp-kpiCard--amber">
       <div class="dp-kpiCard__head">
-        <div class="dp-kpiCard__icon" aria-hidden="true">🧾</div>
+        <div class="dp-kpiCard__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4Z"/><path d="M4 10h16"/><path d="M14 14h6"/><circle cx="8.5" cy="14.5" r="1.5"/></svg></div>
         <div class="dp-kpiCard__meta">
           <div class="dp-kpiCard__label">Gastos</div>
           <div class="dp-kpiCard__value" id="dp-kpi-exp-range">$0.00</div>
@@ -76,38 +119,47 @@
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="dp-grid dp-kpisSub" id="dp-kpis">
+  <section class="dp-grid dp-kpisSub" id="dp-kpis">
     <div class="dp-kpiMini dp-kpiMini--green">
-      <div class="dp-kpiMini__icon" aria-hidden="true">📅</div>
+      <div class="dp-kpiMini__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><path d="M3 10h18"/><path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"/></svg></div>
       <div>
-        <div class="dp-kpiMini__label">Ventas Hoy</div>
+        <div class="dp-kpiMini__label">Ventas hoy</div>
         <div class="dp-kpiMini__value" id="dp-kpi-sales-today">$0.00</div>
-        <div class="dp-kpiMini__hint" id="dp-kpi-sales-today-hint">—</div>
+        <div class="dp-kpiMini__hint" id="dp-kpi-sales-today-hint">-</div>
       </div>
     </div>
 
-    <div class="dp-kpiMini dp-kpiMini--slate">
-      <div class="dp-kpiMini__icon" aria-hidden="true">📈</div>
+    <div class="dp-kpiMini dp-kpiMini--blue">
+      <div class="dp-kpiMini__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M7 15l3-3 3 2 5-6"/></svg></div>
       <div>
-        <div class="dp-kpiMini__label">Últimos 7 Días</div>
+        <div class="dp-kpiMini__label">Últimos 7 días</div>
         <div class="dp-kpiMini__value" id="dp-kpi-sales-7">$0.00</div>
         <div class="dp-kpiMini__hint">Referencia rápida</div>
       </div>
     </div>
 
-    <div class="dp-kpiMini dp-kpiMini--red">
-      <div class="dp-kpiMini__icon" aria-hidden="true">📦</div>
+    <div class="dp-kpiMini dp-kpiMini--purple">
+      <div class="dp-kpiMini__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4Z"/><path d="M8 10h8"/><path d="M8 14h5"/></svg></div>
       <div>
-        <div class="dp-kpiMini__label">Stock Crítico</div>
-        <div class="dp-kpiMini__value" id="dp-kpi-lowstock">0</div>
-        <div class="dp-kpiMini__hint">Stock ≤ <span id="dp-kpi-lowstock-th">5</span></div>
+        <div class="dp-kpiMini__label">Ticket promedio</div>
+        <div class="dp-kpiMini__value" id="dp-kpi-avg">$0.00</div>
+        <div class="dp-kpiMini__hint" id="dp-kpi-avg-hint">Sin ventas</div>
       </div>
     </div>
 
-    <div class="dp-kpiMini dp-kpiMini--blue">
-      <div class="dp-kpiMini__icon" aria-hidden="true">💼</div>
+    <div class="dp-kpiMini dp-kpiMini--red">
+      <div class="dp-kpiMini__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v10l9 5 9-5V8Z"/><path d="M12 22V12"/><path d="M21 8l-9 4-9-4"/></svg></div>
+      <div>
+        <div class="dp-kpiMini__label">Stock crítico</div>
+        <div class="dp-kpiMini__value" id="dp-kpi-lowstock">0</div>
+        <div class="dp-kpiMini__hint">Stock <= <span id="dp-kpi-lowstock-th">5</span></div>
+      </div>
+    </div>
+
+    <div class="dp-kpiMini dp-kpiMini--slate">
+      <div class="dp-kpiMini__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v10H4Z"/><path d="M7 12h10"/></svg></div>
       <div>
         <div class="dp-kpiMini__label">Caja actual</div>
         <div class="dp-kpiMini__value" id="dp-kpi-cash">Cerrada</div>
@@ -115,29 +167,28 @@
       </div>
     </div>
 
-    <div class="dp-kpiMini dp-kpiMini--blue">
-      <div class="dp-kpiMini__icon" aria-hidden="true">🧩</div>
+    <div class="dp-kpiMini dp-kpiMini--amber">
+      <div class="dp-kpiMini__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5"/><path d="M5 19h14"/><path d="M9 16V9"/><path d="M13 16V7"/><path d="M17 16v-4"/></svg></div>
       <div>
         <div class="dp-kpiMini__label" id="dp-kpi-top-exp-label">Gasto principal</div>
         <div class="dp-kpiMini__value" id="dp-kpi-top-exp">$0.00</div>
-        <div class="dp-kpiMini__hint" id="dp-kpi-top-exp-hint">—</div>
+        <div class="dp-kpiMini__hint" id="dp-kpi-top-exp-hint">-</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="dp-grid dp-panels">
-    <div class="dp-card">
+  <section class="dp-grid dp-panels">
+    <div class="dp-card dp-card--chart">
       <div class="dp-card__head">
         <div>
           <div class="dp-card__title">Ventas por día</div>
           <div class="dp-card__sub" id="dp-chart-7d-sub">Total por día (rango)</div>
         </div>
-        <button class="dp-btn dp-btn--ghost" id="dp-dash-refresh">Actualizar</button>
       </div>
       <canvas class="dp-chart" id="dp-chart-7d" height="220"></canvas>
     </div>
 
-    <div class="dp-card">
+    <div class="dp-card dp-card--chart">
       <div class="dp-card__head">
         <div>
           <div class="dp-card__title">Formas de pago</div>
@@ -147,9 +198,9 @@
       <canvas class="dp-chart" id="dp-chart-pay" height="220"></canvas>
       <div class="dp-miniLegend" id="dp-legend-pay"></div>
     </div>
-  </div>
+  </section>
 
-  <div class="dp-grid dp-panels">
+  <section class="dp-grid dp-panels">
     <div class="dp-card">
       <div class="dp-card__head">
         <div>
@@ -163,7 +214,7 @@
           <div class="dp-miniBox__value" id="dp-m-active">0</div>
         </div>
         <div class="dp-miniBox dp-miniBox--warn">
-          <div class="dp-miniBox__label">Vence ≤ 5 días</div>
+          <div class="dp-miniBox__label">Vence <= 5 días</div>
           <div class="dp-miniBox__value" id="dp-m-soon">0</div>
         </div>
         <div class="dp-miniBox dp-miniBox--bad">
@@ -188,10 +239,9 @@
       </div>
       <div class="dp-list" id="dp-top-products"></div>
     </div>
-  </div>
+  </section>
 
-
-  <div class="dp-grid dp-panels">
+  <section class="dp-grid dp-panels">
     <div class="dp-card">
       <div class="dp-card__head">
         <div>
@@ -211,8 +261,9 @@
       </div>
       <div class="dp-list" id="dp-cash-lastcuts"></div>
     </div>
-  </div>
-  <div class="dp-grid dp-panels">
+  </section>
+
+  <section class="dp-grid dp-panels">
     <div class="dp-card">
       <div class="dp-card__head">
         <div>
@@ -223,7 +274,7 @@
       <div class="dp-list" id="dp-last-sales"></div>
     </div>
 
-    <div class="dp-card">
+    <div class="dp-card dp-card--chart">
       <div class="dp-card__head">
         <div>
           <div class="dp-card__title">Gastos por categoría</div>
@@ -233,5 +284,5 @@
       <canvas class="dp-chart" id="dp-chart-exp" height="220"></canvas>
       <div class="dp-miniLegend" id="dp-legend-exp"></div>
     </div>
-  </div>
+  </section>
 </div>

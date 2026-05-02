@@ -24,6 +24,11 @@
     contactTitle: 'Contacto',
     contactText: 'Base de contacto reforzada para una página real del negocio.',
     footerText: 'Página generada por Dinamita POS',
+    seoTitle: '',
+    seoDescription: '',
+    publicUrl: '',
+    shareText: '',
+    useSocialImage: true,
     phone: business.phone || '',
     address: business.address || '',
     hours: '',
@@ -67,6 +72,11 @@
     contactTitle: document.getElementById('pg3-contactTitle'),
     contactText: document.getElementById('pg3-contactText'),
     footerText: document.getElementById('pg3-footerText'),
+    seoTitle: document.getElementById('pg3-seoTitle'),
+    seoDescription: document.getElementById('pg3-seoDescription'),
+    publicUrl: document.getElementById('pg3-publicUrl'),
+    shareText: document.getElementById('pg3-shareText'),
+    useSocialImage: document.getElementById('pg3-useSocialImage'),
     phone: document.getElementById('pg3-phone'),
     address: document.getElementById('pg3-address'),
     hours: document.getElementById('pg3-hours'),
@@ -150,6 +160,11 @@
     if(els.contactTitle) els.contactTitle.value = state.contactTitle || defaults.contactTitle;
     if(els.contactText) els.contactText.value = state.contactText || defaults.contactText;
     if(els.footerText) els.footerText.value = state.footerText || defaults.footerText;
+    if(els.seoTitle) els.seoTitle.value = state.seoTitle || '';
+    if(els.seoDescription) els.seoDescription.value = state.seoDescription || '';
+    if(els.publicUrl) els.publicUrl.value = state.publicUrl || '';
+    if(els.shareText) els.shareText.value = state.shareText || '';
+    if(els.useSocialImage) els.useSocialImage.checked = state.useSocialImage !== false;
     els.phone.value = state.phone || '';
     els.address.value = state.address || '';
     els.hours.value = state.hours || '';
@@ -188,6 +203,11 @@
     bindInput(els.contactTitle, 'contactTitle');
     bindInput(els.contactText, 'contactText');
     bindInput(els.footerText, 'footerText');
+    bindInput(els.seoTitle, 'seoTitle');
+    bindInput(els.seoDescription, 'seoDescription');
+    bindInput(els.publicUrl, 'publicUrl');
+    bindInput(els.shareText, 'shareText');
+    bindCheckbox(els.useSocialImage, 'useSocialImage');
     bindInput(els.phone, 'phone');
     bindInput(els.address, 'address');
     bindInput(els.hours, 'hours');
@@ -492,6 +512,24 @@
 
   function sectionText(key){
     return String(state[key] || defaults[key] || '').trim();
+  }
+
+  function seoTitle(){
+    return String(state.seoTitle || state.businessName || business.name || 'Página web').trim();
+  }
+
+  function seoDescription(){
+    return String(state.seoDescription || state.shareText || state.heroSubtitle || defaults.heroSubtitle).trim();
+  }
+
+  function cleanPublicUrl(value){
+    const raw = String(value || '').trim();
+    if(!raw) return '';
+    return /^https?:\/\//i.test(raw) ? raw.replace(/\/+$/, '') : '';
+  }
+
+  function socialImage(){
+    return state.useSocialImage !== false ? (state.bannerPrimary || '') : '';
   }
 
   function featuredProducts(){
@@ -924,6 +962,11 @@
         contactTitle: sectionText('contactTitle'),
         contactText: sectionText('contactText'),
         footerText: sectionText('footerText'),
+        seoTitle: seoTitle(),
+        seoDescription: seoDescription(),
+        publicUrl: cleanPublicUrl(state.publicUrl),
+        shareText: state.shareText || '',
+        useSocialImage: state.useSocialImage !== false,
         phone: state.phone,
         address: state.address,
         hours: state.hours,
@@ -1000,6 +1043,11 @@
           contactTitle: imported.contactTitle || state.contactTitle,
           contactText: imported.contactText || state.contactText,
           footerText: imported.footerText || state.footerText,
+          seoTitle: imported.seoTitle || state.seoTitle,
+          seoDescription: imported.seoDescription || state.seoDescription,
+          publicUrl: imported.publicUrl || state.publicUrl,
+          shareText: imported.shareText || state.shareText,
+          useSocialImage: imported.useSocialImage !== false,
           phone: imported.phone || state.phone,
           address: imported.address || state.address,
           hours: imported.hours || state.hours,
@@ -1061,13 +1109,31 @@
   }
 
   function buildExternalPageHtml(){
-    const title = escapeHtml(state.businessName || 'Página web');
+    const title = escapeHtml(seoTitle());
+    const description = escapeHtml(seoDescription());
+    const publicUrl = cleanPublicUrl(state.publicUrl);
+    const image = socialImage();
+    const metaUrl = publicUrl ? `<link rel="canonical" href="${escapeHtmlAttr(publicUrl)}">
+  <meta property="og:url" content="${escapeHtmlAttr(publicUrl)}">` : '';
+    const metaImage = image ? `
+  <meta property="og:image" content="${escapeHtmlAttr(image)}">
+  <meta name="twitter:image" content="${escapeHtmlAttr(image)}">` : '';
     return `<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${title}</title>
+  <meta name="description" content="${description}">
+  <meta name="theme-color" content="${escapeHtmlAttr(sanitizeColor(state.primaryColor))}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${description}">
+  <meta property="og:site_name" content="${escapeHtmlAttr(state.businessName || business.name || 'Página web')}">
+  <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
+  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:description" content="${description}">
+  ${metaUrl}${metaImage}
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -1079,12 +1145,19 @@
 
   function buildStandaloneHtml(data, route){
     const safe = JSON.stringify(data).replace(/<\/script/gi,'<\\/script');
+    const metaTitle = escapeHtml(data.state?.seoTitle || data.business?.name || 'Página web');
+    const metaDescription = escapeHtml(data.state?.seoDescription || data.state?.heroSubtitle || '');
     return `<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(data.business?.name || 'Página web')}</title>
+  <title>${metaTitle}</title>
+  <meta name="description" content="${metaDescription}">
+  <meta name="theme-color" content="${escapeHtmlAttr(sanitizeColor(data.state?.primaryColor || state.primaryColor))}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="${metaTitle}">
+  <meta property="og:description" content="${metaDescription}">
   <style>${buildExportCss()}</style>
 </head>
 <body data-route="${route}">

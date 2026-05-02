@@ -427,19 +427,19 @@
       sb.classList.remove("dp-statusbar--ok","dp-statusbar--warn","dp-statusbar--bad");
       if(!sumR.sales.length){
         sb.classList.add("dp-statusbar--warn");
-        sbText.textContent = "⚠️ Sin ventas en este rango. Prueba con otro periodo.";
+        sbText.textContent = "Sin ventas en este rango. Prueba con otro periodo o revisa la operación del día.";
       }else if(net < 0){
         sb.classList.add("dp-statusbar--bad");
-        sbText.textContent = `⚠️ Utilidad negativa (${money(net)}). Revisa gastos en el rango.`;
+        sbText.textContent = `Utilidad negativa (${money(net)}). Revisa gastos y margen en el rango.`;
       }else if(pct >= 0.10){
         sb.classList.add("dp-statusbar--ok");
-        sbText.textContent = `🔥 Buen ritmo. Ventas +${Math.round(pct*100)}% vs rango anterior.`;
+        sbText.textContent = `Buen ritmo. Ventas +${Math.round(pct*100)}% vs rango anterior.`;
       }else if(pct <= -0.10){
         sb.classList.add("dp-statusbar--warn");
-        sbText.textContent = `⚠️ Ventas -${Math.abs(Math.round(pct*100))}% vs rango anterior. Ajusta estrategia.`;
+        sbText.textContent = `Ventas -${Math.abs(Math.round(pct*100))}% vs rango anterior. Ajusta estrategia.`;
       }else{
         sb.classList.add("dp-statusbar--ok");
-        sbText.textContent = "✅ Estable. Mantén constancia y revisa el ticket promedio.";
+        sbText.textContent = "Estable. Mantén constancia y revisa el ticket promedio.";
       }
     }
 
@@ -633,6 +633,15 @@
 
   document.querySelectorAll('.dp-chip[data-preset]').forEach(b=>{
     b.addEventListener('click', ()=> applyPreset(b.getAttribute('data-preset')));
+  });
+
+  document.querySelectorAll('[data-dash-module]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const target = b.getAttribute('data-dash-module');
+      if(!target) return;
+      if(typeof loadModule === 'function') loadModule(target);
+      else document.querySelector(`#menu [data-module="${target}"]`)?.click();
+    });
   });
 
   // Re-render charts on window resize (debounced to avoid loops)
