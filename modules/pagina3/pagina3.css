@@ -65,3 +65,11 @@
 .pg3-onlineProductPrice{font-size:12px;font-weight:800;color:#111;white-space:nowrap}
 .pg3-onlineProductEmpty{padding:12px;border:1px dashed #e7d1d1;border-radius:12px;background:#fff;color:#777;font-size:12px}
 .pg3-webStatus{font-size:12px;color:#666;margin-top:6px}
+
+
+/* Exportación Página 3.0 */
+.pg3-exportActions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+.pg3-uploadJsonLabel{display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pg3-exportStatus{margin-top:10px;padding:10px;border-radius:12px;background:#f8fafc;color:#475569;font-size:.9rem;border:1px solid #e5e7eb}
+.pg3-exportStatus.ok{background:#ecfdf5;color:#166534;border-color:#bbf7d0}
+.pg3-exportStatus.err{background:#fef2f2;color:#991b1b;border-color:#fecaca}
