@@ -15,8 +15,16 @@
 
   const photo = $("c-photo");
   const photoPrev = $("c-photoPrev");
+  const photoFallback = $("c-photoFallback");
   const photoClear = $("c-photoClear");
+  const photoFrame = photoPrev ? photoPrev.closest(".photoFrame") : null;
+  const cameraPreview = $("c-cameraPreview");
+  const cameraCanvas = $("c-cameraCanvas");
+  const cameraOpen = $("c-cameraOpen");
+  const cameraShot = $("c-cameraShot");
+  const cameraCancel = $("c-cameraCancel");
   let photoData = "";
+  let cameraStream = null;
 
   const clearBtn = $("c-clear");
   const search = $("c-search");
@@ -25,6 +33,10 @@
 
   const exportCsvBtn = $("c-exportCsv");
   const exportPdfBtn = $("c-exportPdf");
+  const statTotal = $("c-statTotal");
+  const statPhoto = $("c-statPhoto");
+  const statPhone = $("c-statPhone");
+  const statMissing = $("c-statMissing");
 
   function st(){ return dpGetState(); }
   function escapeHtml(s){
@@ -32,6 +44,25 @@
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
       .replaceAll(">","&gt;");
+  }
+
+  function initials(client){
+    const parts = String(client?.name || "Cliente").trim().split(/\s+/).filter(Boolean);
+    const a = parts[0]?.[0] || "C";
+    const b = parts.length > 1 ? parts[parts.length - 1][0] : "";
+    return (a + b).toUpperCase();
+  }
+
+  function renderStats(){
+    const clients = st().clients || [];
+    const realClients = clients.filter(c=>c.id !== "C000" && c.id !== "GEN");
+    const withPhoto = realClients.filter(c=>!!c.photo).length;
+    const withPhone = realClients.filter(c=>String(c.phone||"").trim()).length;
+    const missing = realClients.filter(c=>!String(c.name||"").trim() || !String(c.phone||"").trim()).length;
+    if(statTotal) statTotal.textContent = String(realClients.length);
+    if(statPhoto) statPhoto.textContent = String(withPhoto);
+    if(statPhone) statPhone.textContent = String(withPhone);
+    if(statMissing) statMissing.textContent = String(missing);
   }
 
   function setModeEdit(client){
@@ -57,27 +88,47 @@
     notes.value = "";
     photo.value = "";
     photoData = "";
+    stopCamera();
     syncPhotoPreview();
     mode.textContent = "Modo: Nuevo";
     status.textContent = "";
   }
 
   function syncPhotoPreview(){
+    if(!photoFrame) return;
+    photoFrame.classList.toggle("has-photo", !!photoData);
+    photoFrame.classList.toggle("is-camera", !!cameraStream);
     if(photoData){
       photoPrev.src = photoData;
-      photoPrev.style.display = "block";
       photoClear.style.display = "inline-flex";
     }else{
       photoPrev.src = "";
-      photoPrev.style.display = "none";
       photoClear.style.display = "none";
     }
+    if(photoFallback) photoFallback.style.display = (!photoData && !cameraStream) ? "" : "none";
   }
 
-  function readFileAsDataURL(file){
+  function imageToDataUrl(source, maxSize=640){
+    const canvas = document.createElement("canvas");
+    const w = source.videoWidth || source.naturalWidth || source.width || maxSize;
+    const h = source.videoHeight || source.naturalHeight || source.height || maxSize;
+    const scale = Math.min(1, maxSize / Math.max(w, h));
+    canvas.width = Math.max(1, Math.round(w * scale));
+    canvas.height = Math.max(1, Math.round(h * scale));
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", .82);
+  }
+
+  function readFileAsImage(file){
     return new Promise((resolve, reject)=>{
       const r = new FileReader();
-      r.onload = ()=>resolve(r.result);
+      r.onload = ()=>{
+        const img = new Image();
+        img.onload = ()=>resolve(img);
+        img.onerror = reject;
+        img.src = String(r.result || "");
+      };
       r.onerror = reject;
       r.readAsDataURL(file);
     });
@@ -86,10 +137,61 @@
   async function onPhotoChange(){
     const f = photo.files && photo.files[0];
     if(!f) return;
-    // limit ~300kb by resizing if needed? (simple: keep as is, but warn)
-    const data = await readFileAsDataURL(f);
-    photoData = data;
+    try{
+      const img = await readFileAsImage(f);
+      photoData = imageToDataUrl(img);
+      stopCamera();
+      syncPhotoPreview();
+    }catch(err){
+      alert("No se pudo leer la imagen.");
+    }
+  }
+
+  async function openCamera(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      alert("Este navegador no permite abrir la cámara desde aquí. Puedes subir una imagen.");
+      return;
+    }
+    try{
+      stopCamera();
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: { ideal: 900 }, height: { ideal: 700 } },
+        audio: false
+      });
+      cameraPreview.srcObject = cameraStream;
+      await cameraPreview.play();
+      cameraShot.hidden = false;
+      cameraCancel.hidden = false;
+      cameraOpen.hidden = true;
+      syncPhotoPreview();
+    }catch(err){
+      alert("No se pudo abrir la cámara. Revisa permisos del navegador.");
+      stopCamera();
+    }
+  }
+
+  function captureCamera(){
+    if(!cameraStream || !cameraPreview) return;
+    photoData = imageToDataUrl(cameraPreview);
+    if(cameraCanvas){
+      cameraCanvas.width = cameraPreview.videoWidth || 640;
+      cameraCanvas.height = cameraPreview.videoHeight || 480;
+      cameraCanvas.getContext("2d").drawImage(cameraPreview,0,0,cameraCanvas.width,cameraCanvas.height);
+    }
+    stopCamera();
     syncPhotoPreview();
+  }
+
+  function stopCamera(){
+    if(cameraStream){
+      cameraStream.getTracks().forEach(t=>t.stop());
+      cameraStream = null;
+    }
+    if(cameraPreview) cameraPreview.srcObject = null;
+    if(cameraShot) cameraShot.hidden = true;
+    if(cameraCancel) cameraCancel.hidden = true;
+    if(cameraOpen) cameraOpen.hidden = false;
+    if(photoFrame) photoFrame.classList.remove("is-camera");
   }
 
   function getFiltered(){
@@ -114,11 +216,17 @@
     clients.slice(0, 600).forEach(c=>{
       const row = document.createElement("div");
       row.className = "crow";
-      const img = document.createElement("img");
-      img.className = "cavatar";
-      img.alt = "Foto";
-      img.src = c.photo || "";
-      if(!c.photo) img.style.visibility = "hidden";
+      let avatar;
+      if(c.photo){
+        avatar = document.createElement("img");
+        avatar.className = "cavatar";
+        avatar.alt = "Foto";
+        avatar.src = c.photo;
+      }else{
+        avatar = document.createElement("div");
+        avatar.className = "cavatarFallback";
+        avatar.textContent = initials(c);
+      }
 
       const main = document.createElement("div");
       main.className = "cmain";
@@ -156,6 +264,7 @@
         if(!res.ok){
           alert(res.reason);
         }else{
+          renderStats();
           render();
           reset();
         }
@@ -164,7 +273,7 @@
       actions.appendChild(edit);
       actions.appendChild(del);
 
-      row.appendChild(img);
+      row.appendChild(avatar);
       row.appendChild(main);
       row.appendChild(actions);
 
@@ -198,8 +307,11 @@
       });
       status.textContent = "Cliente agregado.";
     }
+    const doneMsg = status.textContent;
+    renderStats();
     render();
     reset();
+    status.textContent = doneMsg;
   }
 
   function exportCsv(){
@@ -261,7 +373,10 @@ ${clients.map(c=>`
   // events
   form.addEventListener("submit", save);
   photo.addEventListener("change", onPhotoChange);
-  photoClear.addEventListener("click", ()=>{ photoData=""; syncPhotoPreview(); });
+  photoClear.addEventListener("click", ()=>{ photoData=""; stopCamera(); syncPhotoPreview(); });
+  if(cameraOpen) cameraOpen.addEventListener("click", openCamera);
+  if(cameraShot) cameraShot.addEventListener("click", captureCamera);
+  if(cameraCancel) cameraCancel.addEventListener("click", ()=>{ stopCamera(); syncPhotoPreview(); });
   clearBtn.addEventListener("click", ()=>{ reset(); render(); });
   search.addEventListener("input", render);
   exportCsvBtn.addEventListener("click", exportCsv);
@@ -270,6 +385,7 @@ ${clients.map(c=>`
   // init
   try{ dpEnsureSeedData(); }catch(e){}
   syncPhotoPreview();
+  renderStats();
   render();
   reset();
 })();

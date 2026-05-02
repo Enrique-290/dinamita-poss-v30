@@ -1,81 +1,119 @@
-<section class="clientes">
-  <header class="clientes__header">
-    <div>
+<section class="clientes clientes-crm">
+  <header class="cliHero">
+    <div class="cliHero__copy">
+      <span class="cliHero__eyebrow">Registro visual</span>
       <h1>Clientes</h1>
-      <p class="muted">Alta y gestión de clientes. La foto se usa principalmente para Membresías.</p>
+      <p>Administra datos, teléfono, notas y fotografía opcional para reconocer clientes y miembros más rápido.</p>
+    </div>
+    <div class="cliHero__actions">
+      <button class="btn btn--ghost" type="button" id="c-exportCsv">Exportar Excel</button>
+      <button class="btn" type="button" id="c-exportPdf">Exportar PDF</button>
     </div>
   </header>
 
+  <section class="cliStats">
+    <div class="cliStat cliStat--red">
+      <span>Total clientes</span>
+      <strong id="c-statTotal">0</strong>
+      <small>Registrados</small>
+    </div>
+    <div class="cliStat cliStat--green">
+      <span>Con foto</span>
+      <strong id="c-statPhoto">0</strong>
+      <small>Registro visual</small>
+    </div>
+    <div class="cliStat cliStat--blue">
+      <span>Con teléfono</span>
+      <strong id="c-statPhone">0</strong>
+      <small>Contacto listo</small>
+    </div>
+    <div class="cliStat cliStat--amber">
+      <span>Incompletos</span>
+      <strong id="c-statMissing">0</strong>
+      <small>Sin teléfono o nombre</small>
+    </div>
+  </section>
+
   <div class="clientes__grid">
-    <div class="card">
-      <div class="card__head">
-        <h2 class="h2">Formulario</h2>
-        <div class="muted small" id="c-mode">Modo: Nuevo</div>
+    <aside class="cliPane cliPane--form">
+      <div class="paneHead">
+        <div>
+          <h2>Formulario</h2>
+          <div class="muted small" id="c-mode">Modo: Nuevo</div>
+        </div>
       </div>
-      <div class="divider"></div>
 
       <form id="c-form" autocomplete="off">
         <input type="hidden" id="c-id">
 
+        <div class="photoStudio">
+          <div class="photoFrame">
+            <img id="c-photoPrev" alt="Foto cliente" />
+            <div class="photoFallback" id="c-photoFallback">Sin foto</div>
+            <video id="c-cameraPreview" playsinline muted></video>
+            <canvas id="c-cameraCanvas"></canvas>
+          </div>
+          <div class="photoTools">
+            <label class="filePick">
+              <span>Subir imagen</span>
+              <input id="c-photo" type="file" accept="image/*" capture="environment">
+            </label>
+            <button class="btn btn--ghost" type="button" id="c-cameraOpen">Tomar foto</button>
+            <button class="btn" type="button" id="c-cameraShot" hidden>Capturar</button>
+            <button class="btn btn--ghost" type="button" id="c-cameraCancel" hidden>Cancelar</button>
+            <button class="btn btn--ghost" type="button" id="c-photoClear">Quitar foto</button>
+          </div>
+          <div class="muted small">La foto es opcional y se guarda localmente en el navegador.</div>
+        </div>
+
+        <div class="field">
+          <label>Nombre *</label>
+          <input id="c-name" type="text" placeholder="Nombre completo" required>
+        </div>
+
         <div class="row2">
           <div class="field">
-            <label>Foto (opcional)</label>
-            <input id="c-photo" type="file" accept="image/*">
-            <div class="photoPrev">
-              <img id="c-photoPrev" alt="Foto cliente" />
-              <button class="btn btn--ghost" type="button" id="c-photoClear">Quitar foto</button>
-            </div>
-            <div class="muted small">Se guarda dentro del navegador (localStorage).</div>
+            <label>Teléfono</label>
+            <input id="c-phone" type="tel" placeholder="10 dígitos">
           </div>
+          <div class="field">
+            <label>ID</label>
+            <input id="c-idView" type="text" placeholder="Se genera al guardar" disabled>
+          </div>
+        </div>
 
-          <div>
-            <div class="field">
-              <label>Nombre *</label>
-              <input id="c-name" type="text" placeholder="Nombre completo" required>
-            </div>
-            <div class="row2">
-              <div class="field">
-                <label>Teléfono</label>
-                <input id="c-phone" type="tel" placeholder="10 dígitos">
-              </div>
-              <div class="field">
-                <label>ID</label>
-                <input id="c-idView" type="text" placeholder="Se genera al guardar" disabled>
-              </div>
-            </div>
-            <div class="field">
-              <label>Dirección</label>
-              <input id="c-address" type="text" placeholder="Opcional">
-            </div>
-            <div class="field">
-              <label>Notas</label>
-              <input id="c-notes" type="text" placeholder="Opcional">
-            </div>
-          </div>
+        <div class="field">
+          <label>Dirección</label>
+          <input id="c-address" type="text" placeholder="Opcional">
+        </div>
+
+        <div class="field">
+          <label>Notas</label>
+          <input id="c-notes" type="text" placeholder="Opcional">
         </div>
 
         <div class="actions">
           <button type="button" class="btn btn--ghost" id="c-clear">Limpiar</button>
-          <button type="submit" class="btn" id="c-save">Guardar</button>
+          <button type="submit" class="btn" id="c-save">Guardar cliente</button>
         </div>
 
         <div class="muted small" id="c-status"></div>
       </form>
-    </div>
+    </aside>
 
-    <div class="card">
-      <div class="card__head">
-        <h2 class="h2">Listado</h2>
+    <main class="cliPane cliPane--list">
+      <div class="paneHead paneHead--list">
+        <div>
+          <h2>Listado</h2>
+          <p class="muted small">Busca, edita o elimina clientes desde una vista más visual.</p>
+        </div>
         <div class="filters">
-          <input id="c-search" class="input" placeholder="Súper buscador: nombre / teléfono / ID">
-          <button class="btn btn--ghost" type="button" id="c-exportCsv">Excel</button>
-          <button class="btn btn--ghost" type="button" id="c-exportPdf">PDF</button>
+          <input id="c-search" class="input" placeholder="Nombre / teléfono / ID">
         </div>
       </div>
-      <div class="divider"></div>
 
       <div id="c-list" class="clientList"></div>
-      <div class="muted" id="c-empty" style="display:none;">Sin clientes.</div>
-    </div>
+      <div class="muted cliEmpty" id="c-empty" style="display:none;">Sin clientes.</div>
+    </main>
   </div>
 </section>
