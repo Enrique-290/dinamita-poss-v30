@@ -87,6 +87,18 @@
 
       <div class="pg3-section">
         <h4>Visualización</h4>
+        <label>Color principal</label>
+        <div class="pg3-colorControl">
+          <input id="pg3-primaryColor" type="color" value="#d7192a" aria-label="Color principal">
+          <input id="pg3-primaryColorText" class="input" placeholder="#d7192a">
+        </div>
+        <div class="pg3-toggleGrid">
+          <label class="pg3-check"><input id="pg3-showPrices" type="checkbox"> Mostrar precios</label>
+          <label class="pg3-check"><input id="pg3-showStock" type="checkbox"> Mostrar stock</label>
+          <label class="pg3-check"><input id="pg3-showSku" type="checkbox"> Mostrar SKU</label>
+        </div>
+        <label>Texto botón WhatsApp</label>
+        <input id="pg3-whatsappLabel" class="input" placeholder="Enviar pedido por WhatsApp">
         <label>Límite catálogo</label>
         <input id="pg3-limitCatalog" class="input" type="number" min="4" max="60" step="1" placeholder="8">
         <label>Búsqueda inicial</label>
@@ -122,7 +134,10 @@
           <h3>Vista previa funcional</h3>
           <p id="pg3-currentRouteLabel">Ruta actual: Inicio</p>
         </div>
-        <span class="pg3-chip">Router base activo</span>
+        <div class="pg3-previewTools" id="pg3-previewDevice">
+          <button type="button" class="pg3-deviceBtn active" data-device="desktop">Escritorio</button>
+          <button type="button" class="pg3-deviceBtn" data-device="mobile">Celular</button>
+        </div>
       </div>
       <div id="pg3-previewRoot" class="pg3-previewRoot"></div>
     </section>
