@@ -35,6 +35,7 @@
     whatsappLabel: 'Enviar pedido por WhatsApp',
     previewDevice: 'desktop',
     editorTab: 'design',
+    productSort: 'manual',
     onlineProductIds: null,
     onlineProductSearch: '',
     cart: []
@@ -68,6 +69,7 @@
     whatsappLabel: document.getElementById('pg3-whatsappLabel'),
     previewDevice: document.getElementById('pg3-previewDevice'),
     editorTabs: document.getElementById('pg3-editorTabs'),
+    productSort: document.getElementById('pg3-productSort'),
     onlineProductSearch: document.getElementById('pg3-onlineProductSearch'),
     onlineProductsList: document.getElementById('pg3-onlineProductsList'),
     onlineProductsSummary: document.getElementById('pg3-onlineProductsSummary'),
@@ -105,6 +107,7 @@
         whatsappLabel: parsed.whatsappLabel || defaults.whatsappLabel,
         previewDevice: parsed.previewDevice === 'mobile' ? 'mobile' : 'desktop',
         editorTab: ['design','products','contact','export'].includes(parsed.editorTab) ? parsed.editorTab : 'design',
+        productSort: validProductSort(parsed.productSort),
         onlineProductIds: Array.isArray(parsed.onlineProductIds) ? parsed.onlineProductIds : null,
         onlineProductSearch: parsed.onlineProductSearch || '',
         cart: Array.isArray(parsed.cart) ? parsed.cart : []
@@ -142,6 +145,7 @@
     if(els.whatsappLabel) els.whatsappLabel.value = state.whatsappLabel || defaults.whatsappLabel;
     syncPreviewDeviceButtons();
     syncEditorTabs();
+    if(els.productSort) els.productSort.value = validProductSort(state.productSort);
     if(els.onlineProductSearch) els.onlineProductSearch.value = state.onlineProductSearch || '';
     syncRouteButtons();
     renderOnlineProductsList();
@@ -169,6 +173,14 @@
     bindInput(els.whatsappLabel, 'whatsappLabel');
     bindPreviewDevice();
     bindEditorTabs();
+    if(els.productSort){
+      els.productSort.addEventListener('change', e=>{
+        state.productSort = validProductSort(e.target.value);
+        renderOnlineProductsList();
+        renderPreview();
+        saveState();
+      });
+    }
     els.limitCatalog.addEventListener('input', e=>{
       const n = Number(e.target.value || 8);
       state.limitCatalog = Math.max(4, Math.min(60, n));
@@ -367,7 +379,24 @@
   function allProducts(){
     const ids = publishedIds();
     const allowed = new Set(ids);
-    return rawProducts().filter(p => p && p.id && allowed.has(String(p.id)));
+    return sortProducts(rawProducts().filter(p => p && p.id && allowed.has(String(p.id))));
+  }
+
+  function sortProducts(products, sortKey=state.productSort){
+    const mode = validProductSort(sortKey);
+    const list = Array.isArray(products) ? products.slice() : [];
+    const byText = (a,b,key) => String(a?.[key] || '').localeCompare(String(b?.[key] || ''), 'es', { sensitivity:'base' });
+    if(mode === 'nameAsc') return list.sort((a,b)=> byText(a,b,'name'));
+    if(mode === 'categoryAsc') return list.sort((a,b)=> byText(a,b,'category') || byText(a,b,'name'));
+    if(mode === 'priceAsc') return list.sort((a,b)=> Number(a?.price||0) - Number(b?.price||0) || byText(a,b,'name'));
+    if(mode === 'priceDesc') return list.sort((a,b)=> Number(b?.price||0) - Number(a?.price||0) || byText(a,b,'name'));
+    if(mode === 'stockDesc') return list.sort((a,b)=> Number(b?.stock||0) - Number(a?.stock||0) || byText(a,b,'name'));
+    if(mode === 'recent') return list.sort((a,b)=> String(b?.updatedAt || b?.createdAt || '').localeCompare(String(a?.updatedAt || a?.createdAt || '')) || byText(a,b,'name'));
+    return list;
+  }
+
+  function validProductSort(value){
+    return ['manual','nameAsc','categoryAsc','priceAsc','priceDesc','stockDesc','recent'].includes(value) ? value : 'manual';
   }
 
 
@@ -375,11 +404,11 @@
     if(!els.onlineProductsList) return;
     const q = String(state.onlineProductSearch || '').trim().toLowerCase();
     const products = rawProducts();
-    const visible = products.filter(p => {
+    const visible = sortProducts(products.filter(p => {
       if(!q) return true;
       const hay = [p.name,p.sku,p.barcode,p.category].map(v=>String(v||'').toLowerCase()).join(' ');
       return hay.includes(q);
-    });
+    }));
     const selectedCount = allProducts().length;
     if(els.onlineProductsSummary){
       els.onlineProductsSummary.textContent = `${selectedCount} de ${products.length} productos visibles en web`;
@@ -865,6 +894,7 @@
         showStock: state.showStock !== false,
         showSku: state.showSku !== false,
         whatsappLabel: state.whatsappLabel || defaults.whatsappLabel,
+        productSort: validProductSort(state.productSort),
         onlineProductIds: publishedIds()
       },
       business: {
@@ -932,6 +962,7 @@
           showStock: imported.showStock !== false,
           showSku: imported.showSku !== false,
           whatsappLabel: imported.whatsappLabel || state.whatsappLabel,
+          productSort: validProductSort(imported.productSort || state.productSort),
           onlineProductIds: Array.isArray(imported.onlineProductIds) ? imported.onlineProductIds.map(String) : state.onlineProductIds
         });
         hydrateForm();
@@ -1030,6 +1061,7 @@
   const showStock = state.showStock !== false;
   const showSku = state.showSku !== false;
   const whatsappLabel = state.whatsappLabel || 'Enviar pedido por WhatsApp';
+  const productSort = state.productSort || 'manual';
   let route = 'inicio';
   let selectedCategory = '';
   let selectedProductId = products[0]?.id || '';
@@ -1043,16 +1075,17 @@
   function attr(v){ return esc(v); }
   function cat(v){ return String(v||'General').trim()||'General'; }
   function cats(){ return Array.from(new Set(products.map(p=>cat(p.category)))); }
+  function sortProducts(list){ const arr=Array.isArray(list)?list.slice():[]; const txt=(a,b,k)=>String(a?.[k]||'').localeCompare(String(b?.[k]||''),'es',{sensitivity:'base'}); if(productSort==='nameAsc')return arr.sort((a,b)=>txt(a,b,'name')); if(productSort==='categoryAsc')return arr.sort((a,b)=>txt(a,b,'category')||txt(a,b,'name')); if(productSort==='priceAsc')return arr.sort((a,b)=>Number(a?.price||0)-Number(b?.price||0)||txt(a,b,'name')); if(productSort==='priceDesc')return arr.sort((a,b)=>Number(b?.price||0)-Number(a?.price||0)||txt(a,b,'name')); if(productSort==='stockDesc')return arr.sort((a,b)=>Number(b?.stock||0)-Number(a?.stock||0)||txt(a,b,'name')); if(productSort==='recent')return arr.sort((a,b)=>String(b?.updatedAt||b?.createdAt||'').localeCompare(String(a?.updatedAt||a?.createdAt||''))||txt(a,b,'name')); return arr; }
   function initials(text){ return String(text||'DG').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || 'DG'; }
   function img(p){ return p && p.image ? '<img src="'+attr(p.image)+'" alt="'+attr(p.name)+'">' : '<span>'+esc(initials(p?.name||business.name||'DG'))+'</span>'; }
   function normalizePhone(raw){ const d=String(raw||'').replace(/\D+/g,''); if(!d)return ''; if(d.startsWith('521'))return d; if(d.startsWith('52')&&d.length===12)return '521'+d.slice(2); if(d.length===10)return '521'+d; return d; }
   function openWa(msg){ const phone=normalizePhone(state.phone||business.phone||''); if(!phone){ alert('WhatsApp no configurado.'); return; } window.open('https://api.whatsapp.com/send?phone='+phone+'&text='+encodeURIComponent(msg),'_blank','noopener,noreferrer'); }
-  function filtered(){ return products.filter(p=>{ const byCat=!selectedCategory||cat(p.category)===selectedCategory; const hay=[p.name,p.sku,p.barcode,p.category].map(x=>String(x||'').toLowerCase()).join(' '); const byQ=!query||hay.includes(query.toLowerCase()); return byCat&&byQ; }); }
+  function filtered(){ return sortProducts(products.filter(p=>{ const byCat=!selectedCategory||cat(p.category)===selectedCategory; const hay=[p.name,p.sku,p.barcode,p.category].map(x=>String(x||'').toLowerCase()).join(' '); const byQ=!query||hay.includes(query.toLowerCase()); return byCat&&byQ; })); }
   function setRoute(next, opts){ route = next || 'inicio'; opts = opts || {}; if(opts.category !== undefined) selectedCategory = opts.category; if(opts.productId !== undefined) selectedProductId = opts.productId; window.scrollTo({ top:0, behavior:'smooth' }); render(); }
   function card(p){ const meta=esc(cat(p.category))+(showStock?' · Stock '+Number(p.stock||0):''); return '<article class="card"><div class="media">'+img(p)+'</div><div class="cardBody"><small>'+meta+'</small><h3>'+esc(p.name||'Producto')+'</h3>'+(showPrices?'<div class="price">'+money(p.price)+'</div>':'')+'<div class="actions"><button class="btn" data-add="'+attr(p.id)+'">Agregar</button><button class="btn ghost" data-wa="'+attr(p.id)+'">WhatsApp</button><button class="btn ghost" data-prod="'+attr(p.id)+'">Ver</button></div></div></article>'; }
   function header(){ const name=state.businessName||business.name||'Dinamita Gym'; const logo=business.logo ? '<img class="logo" src="'+attr(business.logo)+'" alt="Logo">' : '<div class="logoFallback">'+esc(initials(name))+'</div>'; return '<header class="top"><div class="wrap topIn"><div class="brand">'+logo+'<div><strong>'+esc(name)+'</strong><small>Tienda online</small></div></div><nav class="nav">'+Object.keys(routeNames).map(r=>'<button type="button" class="'+(route===r?'active':'')+'" data-route="'+r+'">'+routeNames[r]+'</button>').join('')+'</nav></div></header>'; }
   function hero(){ return '<div class="wrap"><section class="hero" style="'+(state.bannerPrimary?'background-image:url(\''+attr(state.bannerPrimary)+'\')':'')+'"><div class="heroOverlay"><div class="eyebrow">Catálogo online</div><h1>'+esc(state.heroTitle||'Explota tu potencial')+'</h1><p>'+esc(state.heroSubtitle||'Conoce nuestros productos y promociones.')+'</p><div class="heroActions"><button class="btn" data-route="tienda">Ver tienda</button><button class="btn ghost" data-general-wa>Escríbenos</button></div></div></section>'+(state.bannerSecondary?'<div class="banner2" style="background-image:url(\''+attr(state.bannerSecondary)+'\')"><h2>Promociones y novedades</h2></div>':'')+'</div>'; }
-  function inicio(){ const featured=products.slice(0, Math.max(4, Number(state.limitCatalog||8))); return '<main>'+hero()+'<section class="section wrap"><div class="sectionHead"><div><h2>Categorías</h2><p class="muted">Explora el catálogo por tipo de producto.</p></div><button class="btn ghost" data-route="tienda">Ver todo</button></div><div class="pills">'+(cats().map(c=>'<button class="pill" data-cat="'+attr(c)+'">'+esc(c)+'</button>').join('') || '<div class="empty">No hay categorías disponibles.</div>')+'</div></section><section class="section wrap"><div class="sectionHead"><div><h2>Productos destacados</h2><p class="muted">Selección publicada desde Dinamita POS.</p></div></div><div class="grid">'+(featured.map(card).join('')||'<div class="empty">No hay productos publicados.</div>')+'</div></section></main>'; }
+  function inicio(){ const featured=sortProducts(products).slice(0, Math.max(4, Number(state.limitCatalog||8))); return '<main>'+hero()+'<section class="section wrap"><div class="sectionHead"><div><h2>Categorías</h2><p class="muted">Explora el catálogo por tipo de producto.</p></div><button class="btn ghost" data-route="tienda">Ver todo</button></div><div class="pills">'+(cats().map(c=>'<button class="pill" data-cat="'+attr(c)+'">'+esc(c)+'</button>').join('') || '<div class="empty">No hay categorías disponibles.</div>')+'</div></section><section class="section wrap"><div class="sectionHead"><div><h2>Productos destacados</h2><p class="muted">Selección publicada desde Dinamita POS.</p></div></div><div class="grid">'+(featured.map(card).join('')||'<div class="empty">No hay productos publicados.</div>')+'</div></section></main>'; }
   function tienda(){ const list=filtered(); return '<main><section class="section wrap"><div class="sectionHead"><div><h2>Tienda</h2><p class="muted">'+list.length+' producto(s) disponibles.</p></div></div><div class="tools"><input class="search" id="q" placeholder="Buscar producto..." value="'+attr(query)+'"><div class="pills"><button class="pill '+(!selectedCategory?'active':'')+'" data-cat="">Todo</button>'+cats().map(c=>'<button class="pill '+(selectedCategory===c?'active':'')+'" data-cat="'+attr(c)+'">'+esc(c)+'</button>').join('')+'</div></div><div class="grid">'+(list.map(card).join('')||'<div class="empty">No hay productos con ese filtro.</div>')+'</div></section></main>'; }
   function categoria(){ if(!selectedCategory) selectedCategory = cats()[0] || ''; return tienda(); }
   function producto(){ const p=products.find(x=>x.id===selectedProductId)||products[0]; if(!p) return '<main class="wrap section"><div class="empty">No hay producto.</div></main>'; const meta=[showStock?'Stock: '+Number(p.stock||0):'',showSku?'SKU: '+esc(p.sku||'—'):''].filter(Boolean).join(' · '); return '<main class="wrap section"><section class="detail"><div class="media">'+img(p)+'</div><div><span class="tag">'+esc(cat(p.category))+'</span><h1>'+esc(p.name)+'</h1><p class="muted">Producto del catálogo online.</p>'+(showPrices?'<h2 class="price">'+money(p.price)+'</h2>':'')+(meta?'<p>'+meta+'</p>':'')+'<div class="actions"><button class="btn" data-add="'+attr(p.id)+'">Agregar</button><button class="btn ghost" data-wa="'+attr(p.id)+'">WhatsApp</button><button class="btn ghost" data-route="tienda">Volver a tienda</button></div></div></section></main>'; }

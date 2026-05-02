@@ -87,6 +87,16 @@
         <div class="pg3-section pg3-onlineProductsSection pg3-prioritySection">
           <h4>Productos para web</h4>
           <p class="pg3-helpText">Elige qué productos del inventario se publican en Página 3.0. Los no marcados no salen en tienda, categorías ni carrito.</p>
+          <label>Orden en la web</label>
+          <select id="pg3-productSort" class="input">
+            <option value="manual">Como inventario</option>
+            <option value="nameAsc">Nombre A-Z</option>
+            <option value="categoryAsc">Categoría A-Z</option>
+            <option value="priceAsc">Precio menor a mayor</option>
+            <option value="priceDesc">Precio mayor a menor</option>
+            <option value="stockDesc">Stock mayor primero</option>
+            <option value="recent">Más recientes primero</option>
+          </select>
           <input id="pg3-onlineProductSearch" class="input" placeholder="Buscar producto para publicar...">
           <div class="pg3-miniActions">
             <button id="pg3-selectAllProducts" class="btn ghost" type="button">Seleccionar todos</button>
