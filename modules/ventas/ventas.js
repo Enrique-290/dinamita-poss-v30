@@ -561,6 +561,17 @@
   if(elOpenCashBtn) elOpenCashBtn.addEventListener("click", openCash);
   if(elCloseCashBtn) elCloseCashBtn.addEventListener("click", closeCash);
 
+  document.querySelectorAll("[data-pay]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const method = btn.getAttribute("data-pay");
+      if(elPayMethod && method){
+        elPayMethod.value = method;
+        document.querySelectorAll("[data-pay]").forEach(x=>x.classList.toggle("is-active", x === btn));
+        setStatus(`Forma de pago seleccionada: ${method}.`, "success");
+      }
+    });
+  });
+
   elPreviewBtn.addEventListener("click", previewTicketFromCart);
   elPrintBtn.addEventListener("click", handlePrint);
     // Defaults
@@ -616,5 +627,3 @@ function dpPrintHTML(html){
   // Safety fallback (in case onload doesn't fire reliably)
   setTimeout(tryPrint, 600);
 }
-
-
