@@ -40,8 +40,8 @@
 
   function sanitizeLabel(s){
     return String(s||"")
-      .replaceAll("dÃ­as","días")
-      .replaceAll("piÃ±a","piña")
+      .replaceAll("dias","días")
+      .replaceAll("pina","piña")
       .replaceAll("higenico","higiénico")
       .trim();
   }
@@ -125,12 +125,14 @@
     const ventas = rows.filter(r=>r.kind==="venta").reduce((a,b)=>a+Number(b.total||0),0);
     const memb = rows.filter(r=>r.kind==="membresia").reduce((a,b)=>a+Number(b.total||0),0);
     const serv = rows.filter(r=>r.kind==="servicio").reduce((a,b)=>a+Number(b.total||0),0);
+    const tickets = new Set(rows.map(r=>r.ticket).filter(Boolean));
+    const avg = tickets.size ? total / tickets.size : 0;
 
     rStats.innerHTML = `
-      <div class="rstat"><div class="k">Registros</div><div class="v">${rows.length}</div></div>
       <div class="rstat"><div class="k">Ventas (productos)</div><div class="v">${fmtMoney(ventas)}</div></div>
       <div class="rstat"><div class="k">Membresías</div><div class="v">${fmtMoney(memb)}</div></div>
       <div class="rstat"><div class="k">Servicios</div><div class="v">${fmtMoney(serv)}</div></div>
+      <div class="rstat"><div class="k">Ticket promedio</div><div class="v">${fmtMoney(avg)}</div></div>
       <div class="rstat"><div class="k">Total</div><div class="v">${fmtMoney(total)}</div></div>
     `;
 
