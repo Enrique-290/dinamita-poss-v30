@@ -1,52 +1,71 @@
-<section class="gastos">
-  <header class="gastos__header">
-    <div>
+<section class="gastos gastos-pro">
+  <header class="gastosHero">
+    <div class="gastosHero__copy">
+      <span class="gastosHero__eyebrow">Control financiero</span>
       <h1>Gastos</h1>
-      <p class="muted">Registra egresos del negocio y consulta el historial.</p>
+      <p>Registra egresos, revisa categorías y exporta movimientos para mantener clara la utilidad del negocio.</p>
     </div>
-    <div class="gastos__totals">
-      <div class="kpi">
-        <div class="kpi__k">Hoy</div>
-        <div class="kpi__v" id="g-kpi-hoy">$0</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi__k">Mes</div>
-        <div class="kpi__v" id="g-kpi-mes">$0</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi__k">Total</div>
-        <div class="kpi__v" id="g-kpi-total">$0</div>
-      </div>
+    <div class="gastosHero__actions">
+      <button class="btn btn--ghost" id="g-xls" type="button">Exportar Excel</button>
+      <button class="btn" id="g-pdf" type="button">Exportar PDF</button>
     </div>
   </header>
 
+  <section class="gastos__totals">
+    <div class="kpi kpi--green">
+      <div class="kpi__k">Hoy</div>
+      <div class="kpi__v" id="g-kpi-hoy">$0</div>
+      <small>Gasto del día</small>
+    </div>
+    <div class="kpi kpi--blue">
+      <div class="kpi__k">Mes</div>
+      <div class="kpi__v" id="g-kpi-mes">$0</div>
+      <small>Acumulado mensual</small>
+    </div>
+    <div class="kpi kpi--amber">
+      <div class="kpi__k">Categoría principal</div>
+      <div class="kpi__v" id="g-kpi-topcat">$0</div>
+      <small id="g-kpi-topcat-label">Sin datos</small>
+    </div>
+    <div class="kpi kpi--red">
+      <div class="kpi__k">Total histórico</div>
+      <div class="kpi__v" id="g-kpi-total">$0</div>
+      <small>Todos los gastos</small>
+    </div>
+  </section>
+
   <div class="g-grid">
-    <div class="card">
-      <h3>Registrar gasto</h3>
+    <aside class="gPane gPane--form">
+      <div class="paneHead">
+        <div>
+          <h2>Registrar gasto</h2>
+          <p class="muted small">Captura fecha, categoría, monto y forma de pago.</p>
+        </div>
+      </div>
 
       <div class="form">
-        <div class="field">
-          <label>Fecha</label>
-          <input type="date" id="g-fecha">
+        <div class="row2">
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" id="g-fecha">
+          </div>
+          <div class="field">
+            <label>Monto (MXN)</label>
+            <input type="number" id="g-monto" min="0" step="0.01" placeholder="0.00">
+          </div>
         </div>
 
         <div class="field">
           <label>Categoría</label>
           <div class="row">
             <select id="g-categoria"></select>
-            <button class="btn btn--ghost btn--mini" id="g-catManage" type="button">+ / −</button>
+            <button class="btn btn--ghost btn--mini" id="g-catManage" type="button">Categorías</button>
           </div>
-          <div class="hint">Puedes editar categorías en Configuración → Respaldo o aquí.</div>
         </div>
 
         <div class="field">
           <label>Descripción</label>
           <input type="text" id="g-desc" placeholder="Ej. Pago de luz, renta, compra de insumos">
-        </div>
-
-        <div class="field">
-          <label>Monto (MXN)</label>
-          <input type="number" id="g-monto" min="0" step="0.01" placeholder="0.00">
         </div>
 
         <div class="field">
@@ -69,22 +88,23 @@
           <button class="btn" id="g-guardar" type="button">Guardar gasto</button>
         </div>
       </div>
-    </div>
+    </aside>
 
-    <div class="card">
-      <h3>Historial</h3>
-
-      <div class="filters">
-        <input id="g-q" type="search" placeholder="Buscar (descripción/categoría)">
-        <div class="row">
-          <input id="g-desde" type="date">
-          <input id="g-hasta" type="date">
-          <button class="btn btn--ghost btn--mini" id="g-aplicar" type="button">Aplicar</button>
-          <button class="btn btn--ghost btn--mini" id="g-reset" type="button">Restablecer</button>
-          <button class="btn btn--mini" id="g-xls" type="button">Excel</button>
-          <button class="btn btn--mini btn--ghost" id="g-pdf" type="button">PDF</button>
+    <main class="gPane gPane--history">
+      <div class="paneHead paneHead--history">
+        <div>
+          <h2>Historial</h2>
+          <p class="muted small">Filtra por fecha, categoría, descripción o forma de pago.</p>
         </div>
       </div>
+
+      <section class="filters">
+        <input id="g-q" type="search" placeholder="Buscar descripción / categoría">
+        <input id="g-desde" type="date">
+        <input id="g-hasta" type="date">
+        <button class="btn btn--ghost btn--mini" id="g-aplicar" type="button">Aplicar</button>
+        <button class="btn btn--ghost btn--mini" id="g-reset" type="button">Restablecer</button>
+      </section>
 
       <div class="tableWrap">
         <table class="table">
@@ -109,10 +129,9 @@
           <strong id="g-sum">$0</strong>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 
-  <!-- Modal categorías -->
   <div class="modal" id="g-catModal" aria-hidden="true">
     <div class="modal__backdrop" data-close="1"></div>
     <div class="modal__card">
