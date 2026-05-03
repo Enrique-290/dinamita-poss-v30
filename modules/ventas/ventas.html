@@ -32,6 +32,35 @@
           </div>
         </div>
         <div class="cashBox__grid" id="v-cashSummary"></div>
+
+        <div class="cashControl">
+          <div class="cashControl__open">
+            <label>Fondo inicial</label>
+            <div class="cashInputRow">
+              <input id="v-openCashAmount" type="number" min="0" step="0.01" placeholder="0.00">
+              <button class="btn btn--ghost btn--mini" type="button" id="v-openCashQuick">Abrir</button>
+            </div>
+          </div>
+          <div class="cashControl__close">
+            <label>Dinero contado</label>
+            <div class="cashInputRow">
+              <input id="v-closeCashAmount" type="number" min="0" step="0.01" placeholder="0.00">
+              <button class="btn btn--mini" type="button" id="v-closeCashQuick">Cerrar</button>
+            </div>
+          </div>
+          <div class="cashControl__notes">
+            <label>Observaciones</label>
+            <input id="v-closeCashNotes" type="text" placeholder="Opcional">
+          </div>
+        </div>
+
+        <div class="cashBox__footer">
+          <div>
+            <span>Esperado en efectivo</span>
+            <strong id="v-cashExpected">$0.00</strong>
+          </div>
+          <button class="btn btn--ghost btn--mini" type="button" id="v-printLastCashBtn">Reimprimir último corte</button>
+        </div>
       </div>
 
       <div class="searchPanel">

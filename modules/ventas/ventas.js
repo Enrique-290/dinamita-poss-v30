@@ -18,6 +18,13 @@
   const elCashSummary = $("v-cashSummary");
   const elOpenCashBtn = $("v-openCashBtn");
   const elCloseCashBtn = $("v-closeCashBtn");
+  const elOpenCashAmount = $("v-openCashAmount");
+  const elCloseCashAmount = $("v-closeCashAmount");
+  const elCloseCashNotes = $("v-closeCashNotes");
+  const elOpenCashQuick = $("v-openCashQuick");
+  const elCloseCashQuick = $("v-closeCashQuick");
+  const elCashExpected = $("v-cashExpected");
+  const elPrintLastCashBtn = $("v-printLastCashBtn");
 
   const elClient = $("v-client");
   const elPayMethod = $("v-payMethod");
@@ -50,39 +57,74 @@
     return d.toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
   }
 
+  function cashExpenses(sessionId){
+    const st = state();
+    return (st.expenses || [])
+      .filter(x=>String(x?.cashSessionId || "") === String(sessionId || ""))
+      .reduce((sum,x)=>sum + Number(x?.amount || 0), 0);
+  }
+
+  function lastClosedCashSession(){
+    const sessions = (typeof dpGetCashSessions === "function") ? dpGetCashSessions() : [];
+    return sessions
+      .filter(s=>s.status === "closed")
+      .sort((a,b)=>String(b.closedAt || b.openedAt || "").localeCompare(String(a.closedAt || a.openedAt || "")))[0] || null;
+  }
+
   function renderCashBox(){
     const session = (typeof dpGetActiveCashSession === "function") ? dpGetActiveCashSession() : null;
     if(!session){
       if(elCashStatus) elCashStatus.textContent = "No hay caja abierta. Abre caja para vender.";
       if(elCashSummary) elCashSummary.innerHTML = `
-        <div class="pill">Estado: cerrada</div>
-        <div class="pill">Ventas turno: $0.00</div>
-        <div class="pill">Usuario: —</div>
+        <div class="cashMetric"><span>Estado</span><strong>Cerrada</strong></div>
+        <div class="cashMetric"><span>Ventas turno</span><strong>$0.00</strong></div>
+        <div class="cashMetric"><span>Usuario</span><strong>—</strong></div>
       `;
+      if(elCashExpected) elCashExpected.textContent = dpFmtMoney(0);
+      if(elCloseCashAmount) elCloseCashAmount.value = "";
+      if(elCloseCashNotes) elCloseCashNotes.value = "";
       if(elSell) elSell.disabled = true;
       if(elOpenCashBtn) elOpenCashBtn.disabled = false;
       if(elCloseCashBtn) elCloseCashBtn.disabled = true;
+      if(elOpenCashQuick) elOpenCashQuick.disabled = false;
+      if(elCloseCashQuick) elCloseCashQuick.disabled = true;
+      if(elPrintLastCashBtn) elPrintLastCashBtn.disabled = !lastClosedCashSession();
       return;
     }
     if(elCashStatus) elCashStatus.textContent = `Caja abierta por ${session.userName || 'Usuario'} desde ${fmtCashTime(session.openedAt)}.`;
+    const byPay = session?.totals?.byPayment || {};
+    const efectivo = Number(byPay.efectivo || 0);
+    const expected = Number(session.openingAmount || 0) + efectivo;
+    const expenses = cashExpenses(session.id);
+    const net = Number(session?.totals?.total || 0) - expenses;
     if(elCashSummary) elCashSummary.innerHTML = `
-      <div class="pill">Fondo inicial: ${dpFmtMoney(session.openingAmount || 0)}</div>
-      <div class="pill">Ventas: ${dpFmtMoney(session?.totals?.sales || 0)}</div>
-      <div class="pill">Membresías: ${dpFmtMoney(session?.totals?.memberships || 0)}</div>
-      <div class="pill">Total: ${dpFmtMoney(session?.totals?.total || 0)}</div>
+      <div class="cashMetric cashMetric--info"><span>Fondo</span><strong>${dpFmtMoney(session.openingAmount || 0)}</strong></div>
+      <div class="cashMetric"><span>Productos</span><strong>${dpFmtMoney(session?.totals?.sales || 0)}</strong></div>
+      <div class="cashMetric"><span>Membresías</span><strong>${dpFmtMoney(session?.totals?.memberships || 0)}</strong></div>
+      <div class="cashMetric"><span>Efectivo</span><strong>${dpFmtMoney(efectivo)}</strong></div>
+      <div class="cashMetric"><span>Tarjeta</span><strong>${dpFmtMoney(byPay.tarjeta || 0)}</strong></div>
+      <div class="cashMetric"><span>Transferencia</span><strong>${dpFmtMoney(byPay.transferencia || 0)}</strong></div>
+      <div class="cashMetric cashMetric--warn"><span>Gastos</span><strong>${dpFmtMoney(expenses)}</strong></div>
+      <div class="cashMetric cashMetric--ok"><span>Neto</span><strong>${dpFmtMoney(net)}</strong></div>
     `;
+    if(elCashExpected) elCashExpected.textContent = dpFmtMoney(expected);
+    if(elCloseCashAmount && !elCloseCashAmount.value) elCloseCashAmount.value = String(expected.toFixed(2));
     if(elSell) elSell.disabled = false;
     if(elOpenCashBtn) elOpenCashBtn.disabled = true;
     if(elCloseCashBtn) elCloseCashBtn.disabled = false;
+    if(elOpenCashQuick) elOpenCashQuick.disabled = true;
+    if(elCloseCashQuick) elCloseCashQuick.disabled = false;
+    if(elPrintLastCashBtn) elPrintLastCashBtn.disabled = false;
   }
 
   function openCash(){
-    const raw = prompt("Fondo inicial de caja:", "0");
+    const raw = elOpenCashAmount ? elOpenCashAmount.value : prompt("Fondo inicial de caja:", "0");
     if(raw === null) return;
     try{
       const amount = Number(raw || 0);
       if(!Number.isFinite(amount) || amount < 0){ alert("Monto inválido."); return; }
       dpOpenCashSession({ openingAmount: amount });
+      if(elOpenCashAmount) elOpenCashAmount.value = "";
       setStatus("Caja abierta correctamente.", "success");
       renderCashBox();
     }catch(err){ alert(err?.message || "No se pudo abrir caja."); }
@@ -92,9 +134,9 @@
     const session = (typeof dpGetActiveCashSession === "function") ? dpGetActiveCashSession() : null;
     if(!session){ alert("No hay caja abierta."); return; }
     const expected = Number(session.openingAmount || 0) + Number(session?.totals?.byPayment?.efectivo || 0);
-    const countedRaw = prompt(`Dinero contado en caja. Esperado: ${dpFmtMoney(expected)}`, String(expected));
+    const countedRaw = elCloseCashAmount ? elCloseCashAmount.value : prompt(`Dinero contado en caja. Esperado: ${dpFmtMoney(expected)}`, String(expected));
     if(countedRaw === null) return;
-    const notes = prompt("Observaciones del cierre (opcional):", session?.difference===0 ? "Cierre sin faltantes." : "") || "";
+    const notes = elCloseCashNotes ? elCloseCashNotes.value : (prompt("Observaciones del cierre (opcional):", "Cierre sin faltantes.") || "");
     try{
       const counted = Number(countedRaw || 0);
       if(!Number.isFinite(counted) || counted < 0){ alert("Monto inválido."); return; }
@@ -110,6 +152,14 @@
         }
       }, 20);
     }catch(err){ alert(err?.message || "No se pudo cerrar caja."); }
+  }
+
+  function printLastCashCut(){
+    const session = lastClosedCashSession();
+    if(!session){ alert("No hay cortes para imprimir."); return; }
+    if(typeof dpPrintCashCloseTicketBySessionId !== "function"){ alert("La impresión de cortes no está disponible."); return; }
+    const ok = dpPrintCashCloseTicketBySessionId(session.id);
+    if(!ok) alert("No se encontró el corte para imprimir.");
   }
 
   function renderClients(){
@@ -560,6 +610,9 @@
   elSell.addEventListener("click", doSell);
   if(elOpenCashBtn) elOpenCashBtn.addEventListener("click", openCash);
   if(elCloseCashBtn) elCloseCashBtn.addEventListener("click", closeCash);
+  if(elOpenCashQuick) elOpenCashQuick.addEventListener("click", openCash);
+  if(elCloseCashQuick) elCloseCashQuick.addEventListener("click", closeCash);
+  if(elPrintLastCashBtn) elPrintLastCashBtn.addEventListener("click", printLastCashCut);
 
   document.querySelectorAll("[data-pay]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
