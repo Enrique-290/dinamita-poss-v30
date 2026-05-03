@@ -46,50 +46,54 @@
       <form id="c-form" autocomplete="off">
         <input type="hidden" id="c-id">
 
-        <div class="photoStudio">
-          <div class="photoFrame">
-            <img id="c-photoPrev" alt="Foto cliente" />
-            <div class="photoFallback" id="c-photoFallback">Sin foto</div>
-            <video id="c-cameraPreview" playsinline muted></video>
-            <canvas id="c-cameraCanvas"></canvas>
+        <div class="clientFormGrid">
+          <div class="photoStudio">
+            <div class="photoFrame">
+              <img id="c-photoPrev" alt="Foto cliente" />
+              <div class="photoFallback" id="c-photoFallback">Sin foto</div>
+              <video id="c-cameraPreview" playsinline muted></video>
+              <canvas id="c-cameraCanvas"></canvas>
+            </div>
+            <div class="photoTools">
+              <label class="filePick">
+                <span>Subir imagen</span>
+                <input id="c-photo" type="file" accept="image/*" capture="environment">
+              </label>
+              <button class="btn btn--ghost" type="button" id="c-cameraOpen">Tomar foto</button>
+              <button class="btn" type="button" id="c-cameraShot" hidden>Capturar</button>
+              <button class="btn btn--ghost" type="button" id="c-cameraCancel" hidden>Cancelar</button>
+              <button class="btn btn--ghost" type="button" id="c-photoClear">Quitar foto</button>
+            </div>
+            <div class="muted small">La foto es opcional y se guarda localmente.</div>
           </div>
-          <div class="photoTools">
-            <label class="filePick">
-              <span>Subir imagen</span>
-              <input id="c-photo" type="file" accept="image/*" capture="environment">
-            </label>
-            <button class="btn btn--ghost" type="button" id="c-cameraOpen">Tomar foto</button>
-            <button class="btn" type="button" id="c-cameraShot" hidden>Capturar</button>
-            <button class="btn btn--ghost" type="button" id="c-cameraCancel" hidden>Cancelar</button>
-            <button class="btn btn--ghost" type="button" id="c-photoClear">Quitar foto</button>
+
+          <div class="clientFields">
+            <div class="field">
+              <label>Nombre *</label>
+              <input id="c-name" type="text" placeholder="Nombre completo" required>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <label>Teléfono</label>
+                <input id="c-phone" type="tel" placeholder="10 dígitos">
+              </div>
+              <div class="field">
+                <label>ID</label>
+                <input id="c-idView" type="text" placeholder="Se genera al guardar" disabled>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Dirección</label>
+              <input id="c-address" type="text" placeholder="Opcional">
+            </div>
+
+            <div class="field">
+              <label>Notas</label>
+              <input id="c-notes" type="text" placeholder="Opcional">
+            </div>
           </div>
-          <div class="muted small">La foto es opcional y se guarda localmente en el navegador.</div>
-        </div>
-
-        <div class="field">
-          <label>Nombre *</label>
-          <input id="c-name" type="text" placeholder="Nombre completo" required>
-        </div>
-
-        <div class="row2">
-          <div class="field">
-            <label>Teléfono</label>
-            <input id="c-phone" type="tel" placeholder="10 dígitos">
-          </div>
-          <div class="field">
-            <label>ID</label>
-            <input id="c-idView" type="text" placeholder="Se genera al guardar" disabled>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Dirección</label>
-          <input id="c-address" type="text" placeholder="Opcional">
-        </div>
-
-        <div class="field">
-          <label>Notas</label>
-          <input id="c-notes" type="text" placeholder="Opcional">
         </div>
 
         <div class="actions">
