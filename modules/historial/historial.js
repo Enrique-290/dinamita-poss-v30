@@ -121,11 +121,12 @@
     const total = list.reduce((a,b)=>a+Number(b.total||0),0);
     const ventas = list.filter(s=>s.type==="venta").length;
     const servicios = list.filter(s=>s.type!=="venta").length;
+    const avg = list.length ? total / list.length : 0;
     hStats.innerHTML = `
-      <div class="stat"><div class="k">Registros</div><div class="v">${list.length}</div></div>
-      <div class="stat"><div class="k">Ventas</div><div class="v">${ventas}</div></div>
-      <div class="stat"><div class="k">Servicios/Membresías</div><div class="v">${servicios}</div></div>
       <div class="stat"><div class="k">Total</div><div class="v">${fmtMoney(total)}</div></div>
+      <div class="stat"><div class="k">Tickets</div><div class="v">${list.length}</div></div>
+      <div class="stat"><div class="k">Venta promedio</div><div class="v">${fmtMoney(avg)}</div></div>
+      <div class="stat"><div class="k">Servicios/Membresías</div><div class="v">${servicios}</div></div>
     `;
   }
 
