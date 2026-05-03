@@ -271,7 +271,7 @@
 }
 .membresias-pro .memList{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:1fr;
   gap:12px;
 }
 .membresias-pro .mcard{
@@ -279,7 +279,7 @@
   border-radius:8px;
   padding:12px;
   display:grid;
-  grid-template-columns:54px minmax(0,1fr);
+  grid-template-columns:48px minmax(0,1fr);
   gap:12px;
   align-items:start;
   background:#fff;
@@ -293,8 +293,10 @@
 }
 .membresias-pro .mavatar,
 .membresias-pro .mavatarFallback{
-  width:54px;
-  height:54px;
+  width:48px;
+  height:48px;
+  max-width:48px;
+  max-height:48px;
   border-radius:8px;
   border:1px solid var(--mem-line);
   background:#f2f4f7;
@@ -335,7 +337,7 @@
 .membresias-pro .pill.orange{ background:#fff7ed; border-color:#fed7aa; color:#9a3412; }
 .membresias-pro .pill.red{ background:#fff1f1; border-color:#fecaca; color:#991b1b; }
 .membresias-pro .mactions{
-  grid-column:1 / -1;
+  grid-column:2;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
@@ -451,5 +453,8 @@
   .membresias-pro .memList,
   .membresias-pro .catalogList{
     grid-template-columns:1fr;
+  }
+  .membresias-pro .mactions{
+    grid-column:1 / -1;
   }
 }
