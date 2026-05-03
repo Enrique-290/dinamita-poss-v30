@@ -1,20 +1,333 @@
-.dp-acceso .dp-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media (max-width: 980px){.dp-acceso .dp-grid2{grid-template-columns:1fr}}
-.dp-acceso .dp-inputBig{font-size:18px;font-weight:800;letter-spacing:.3px;padding:12px 14px}
-.dp-accessStatus{border-radius:14px;padding:16px;margin-top:10px;border:2px solid rgba(0,0,0,.12);background:#fff}
-.dp-accessTitle{font-size:20px;font-weight:900}
-.dp-accessMeta{margin-top:6px;opacity:.85}
-.dp-accessIdle{border-color:rgba(0,0,0,.12)}
-.dp-accessOk{border-color:rgba(0,180,90,.35);background:rgba(0,180,90,.06)}
-.dp-accessWarn{border-color:rgba(255,140,0,.4);background:rgba(255,140,0,.06)}
-.dp-accessBad{border-color:rgba(220,50,50,.35);background:rgba(220,50,50,.06)}
-.dp-kv{display:flex;flex-direction:column;gap:8px}
-.dp-kvRow{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed rgba(0,0,0,.12);padding-bottom:6px}
-.dp-kvK{opacity:.7}
-.dp-kvV{text-align:right}
-.dp-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-weight:900;font-size:12px;letter-spacing:.4px}
-.dp-badgeOk{background:rgba(0,180,90,.12);border:1px solid rgba(0,180,90,.35)}
-.dp-badgeWarn{background:rgba(255,140,0,.12);border:1px solid rgba(255,140,0,.4)}
-.dp-badgeBad{background:rgba(220,50,50,.12);border:1px solid rgba(220,50,50,.35)}
-/* Modo Acceso: opcional, oculta/inhabilita navegación con PIN (visual) */
-body.dp-accessMode .dp-nav .dp-navBtn{opacity:.55}
+.acceso-pro{
+  --a-red:#c90000;
+  --a-red-dark:#8d0000;
+  --a-green:#12a150;
+  --a-amber:#d97706;
+  --a-blue:#1f6feb;
+  --a-ink:#101318;
+  --a-muted:#69717f;
+  --a-line:#e8e3df;
+  --a-soft:#fff6f1;
+  color:var(--a-ink);
+}
+.acceso-pro *{ box-sizing:border-box; }
+.acceso-pro h2,
+.acceso-pro h3,
+.acceso-pro p{ margin:0; }
+
+.accessHero{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,520px);
+  gap:18px;
+  align-items:stretch;
+  padding:22px;
+  border:1px solid rgba(201,0,0,.14);
+  border-radius:8px;
+  background:
+    radial-gradient(circle at 90% 18%, rgba(255,255,255,.34), transparent 28%),
+    linear-gradient(135deg, #141821 0%, #7d0710 58%, #d20b12 100%);
+  color:#fff;
+  box-shadow:0 22px 54px rgba(125,7,16,.18);
+}
+.accessHero__copy{ display:flex; flex-direction:column; justify-content:center; gap:10px; }
+.accessHero__eyebrow,
+.accessPanel__kicker{
+  width:max-content;
+  max-width:100%;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:950;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.accessHero__eyebrow{
+  border:1px solid rgba(255,255,255,.24);
+  background:rgba(255,255,255,.12);
+}
+.accessHero h2{
+  font-size:clamp(34px, 4vw, 56px);
+  line-height:1;
+}
+.accessHero p{
+  max-width:720px;
+  color:rgba(255,255,255,.88);
+  line-height:1.5;
+  font-size:16px;
+}
+.accessHero__actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:4px;
+}
+.accessHero__stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  align-content:center;
+}
+.accessStat{
+  min-height:112px;
+  padding:14px;
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:8px;
+  background:rgba(255,255,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+}
+.accessStat span{
+  display:block;
+  color:rgba(255,255,255,.78);
+  font-size:12px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.accessStat strong{
+  display:block;
+  margin-top:10px;
+  font-size:34px;
+  line-height:1;
+}
+.accessStat--ok{ border-top:4px solid #8ef0b1; }
+.accessStat--warn{ border-top:4px solid #facc15; }
+.accessStat--bad{ border-top:4px solid #fda4af; }
+
+.accessLayout{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(340px,.9fr);
+  grid-template-areas:
+    "scan last"
+    "log log";
+  gap:16px;
+  margin-top:16px;
+}
+.accessPanel{
+  border:1px solid var(--a-line);
+  border-radius:8px;
+  background:#fff;
+  padding:16px;
+  box-shadow:0 14px 34px rgba(15,23,42,.07);
+}
+.accessPanel--scan{ grid-area:scan; }
+.accessPanel--last{ grid-area:last; }
+.accessPanel--log{ grid-area:log; }
+.accessPanel__head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.accessPanel__head--log{ align-items:flex-end; }
+.accessPanel__kicker{
+  padding:0;
+  color:var(--a-red);
+  background:transparent;
+}
+.accessPanel h3{
+  margin-top:3px;
+  font-size:24px;
+  line-height:1.05;
+}
+.accessModePill{
+  border:1px solid #ffd0d0;
+  border-radius:999px;
+  padding:8px 11px;
+  background:#fff5f5;
+  color:var(--a-red-dark);
+  font-size:12px;
+  font-weight:950;
+}
+
+.accessScanBox{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:end;
+}
+.acceso-pro .dp-field label{
+  display:block;
+  margin-bottom:6px;
+  color:#20242c;
+  font-size:12px;
+  font-weight:950;
+  text-transform:uppercase;
+}
+.acceso-pro .dp-input{
+  width:100%;
+  min-height:46px;
+  border:1px solid var(--a-line);
+  border-radius:8px;
+  padding:11px 12px;
+  background:#fff;
+  color:var(--a-ink);
+  font:inherit;
+  font-weight:850;
+  outline:none;
+}
+.acceso-pro .dp-input:focus{
+  border-color:rgba(201,0,0,.44);
+  box-shadow:0 0 0 4px rgba(201,0,0,.10);
+}
+.acceso-pro .dp-inputBig{
+  min-height:58px;
+  font-size:20px;
+  font-weight:950;
+}
+.accessCheckBtn{
+  min-height:58px;
+  min-width:140px;
+}
+.accessOptions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:flex-end;
+  margin-top:12px;
+}
+.accessMinutes{
+  display:grid;
+  grid-template-columns:110px auto;
+  gap:8px;
+  align-items:center;
+}
+.accessMinutes span,
+.accessTip{
+  color:var(--a-muted);
+  font-size:12px;
+  font-weight:850;
+}
+
+.dp-accessStatus{
+  min-height:132px;
+  border-radius:8px;
+  padding:18px;
+  margin-top:14px;
+  border:2px solid rgba(0,0,0,.12);
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.dp-accessTitle{
+  font-size:28px;
+  line-height:1.08;
+  font-weight:950;
+}
+.dp-accessMeta{
+  margin-top:8px;
+  color:var(--a-muted);
+  font-size:15px;
+  font-weight:800;
+  line-height:1.4;
+}
+.dp-accessIdle{ border-color:#d9dde5; background:#f8fafc; }
+.dp-accessOk{ border-color:rgba(18,161,80,.42); background:#f1fff6; }
+.dp-accessWarn{ border-color:rgba(217,119,6,.42); background:#fff8e9; }
+.dp-accessBad{ border-color:rgba(201,0,0,.36); background:#fff3f3; }
+.accessActionRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:12px;
+}
+
+.dp-kv{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.dp-kvRow{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px;
+  border:1px solid var(--a-line);
+  border-radius:8px;
+  background:#fff;
+}
+.dp-kvK{
+  color:var(--a-muted);
+  font-size:12px;
+  font-weight:950;
+  text-transform:uppercase;
+}
+.dp-kvV{
+  text-align:right;
+  font-weight:900;
+}
+.dp-badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:5px 10px;
+  border-radius:999px;
+  font-weight:950;
+  font-size:12px;
+  letter-spacing:0;
+}
+.dp-badgeOk{ color:#066031; background:rgba(18,161,80,.12); border:1px solid rgba(18,161,80,.35); }
+.dp-badgeWarn{ color:#8a4b00; background:rgba(217,119,6,.12); border:1px solid rgba(217,119,6,.35); }
+.dp-badgeBad{ color:#970000; background:rgba(201,0,0,.10); border:1px solid rgba(201,0,0,.30); }
+
+.accessLogTools{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:flex-end;
+}
+.accessLogTools .dp-input{ width:240px; }
+.accessTableWrap{
+  border:1px solid var(--a-line);
+  border-radius:8px;
+  overflow:auto;
+}
+.acceso-pro .dp-table{
+  width:100%;
+  border-collapse:collapse;
+}
+.acceso-pro .dp-table th{
+  position:sticky;
+  top:0;
+  background:#fff7f4;
+  color:#4a1b1b;
+  text-align:left;
+  font-size:12px;
+  text-transform:uppercase;
+  z-index:1;
+}
+.acceso-pro .dp-table th,
+.acceso-pro .dp-table td{
+  padding:12px;
+  border-bottom:1px solid var(--a-line);
+  vertical-align:top;
+}
+.acceso-pro .dp-hint{
+  color:var(--a-muted);
+  font-size:12px;
+  line-height:1.35;
+}
+
+body.dp-accessMode .dp-nav .dp-navBtn{ opacity:.55; }
+
+@media(max-width:1100px){
+  .accessHero,
+  .accessLayout{ grid-template-columns:1fr; }
+  .accessLayout{
+    grid-template-areas:
+      "scan"
+      "last"
+      "log";
+  }
+}
+@media(max-width:720px){
+  .accessHero{ padding:18px; }
+  .accessHero__stats,
+  .accessScanBox{ grid-template-columns:1fr; }
+  .accessPanel__head,
+  .accessPanel__head--log{ align-items:stretch; flex-direction:column; }
+  .accessCheckBtn{ width:100%; }
+  .accessLogTools .dp-input{ width:100%; }
+  .dp-kvRow{ flex-direction:column; }
+  .dp-kvV{ text-align:left; }
+}

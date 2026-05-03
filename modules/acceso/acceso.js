@@ -13,6 +13,10 @@
   const btnExport = $("a-export");
   const tbody = $("a-table").querySelector("tbody");
   const btnMode = $("a-toggleMode");
+  const statAllowed = $("a-statAllowed");
+  const statWarning = $("a-statWarning");
+  const statDenied = $("a-statDenied");
+  const modePill = $("a-modePill");
 
   // --- helpers ---
   const fmtMoney = (n)=>"$" + (Number(n||0)).toFixed(2);
@@ -186,6 +190,18 @@
         <td>${escapeHtml(x.detail||"")}</td>
       </tr>`;
     }).join("");
+    renderStats();
+  }
+
+  function renderStats(){
+    const st = state();
+    const logs = (st.accessLogs || []).filter(x=>x.date === todayISO());
+    const allowed = logs.filter(x=>x.result === "allowed").length;
+    const warning = logs.filter(x=>x.result === "warning").length;
+    const denied = logs.filter(x=>x.result === "denied").length;
+    if(statAllowed) statAllowed.textContent = String(allowed);
+    if(statWarning) statWarning.textContent = String(warning);
+    if(statDenied) statDenied.textContent = String(denied);
   }
 
   function escapeHtml(s){
@@ -371,6 +387,7 @@
     sessionStorage.setItem("dp_access_mode", on ? "1":"0");
     document.body.classList.toggle("dp-accessMode", !!on);
     btnMode.textContent = on ? "Modo Acceso: ON" : "Modo Acceso: OFF";
+    if(modePill) modePill.textContent = on ? "Modo acceso activo" : "Recepción";
   }
 
   function requirePin(){
