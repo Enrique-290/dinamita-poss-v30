@@ -1,18 +1,43 @@
-<section class="membresias">
-  <header class="mem__header">
-    <div>
+<section class="membresias membresias-pro">
+  <header class="memHero">
+    <div class="memHero__copy">
+      <span class="memHero__eyebrow">Control de acceso</span>
       <h1>Membresías</h1>
-      <p class="muted">Catálogo editable de membresías + inscripción rápida. Al cobrar, se registra como venta (sin afectar inventario).</p>
+      <p>Administra planes, cobra membresías y revisa clientes activos con referencia visual por foto.</p>
     </div>
     <button class="btn btn--ghost" type="button" id="mc-toggle">Catálogo de membresías</button>
   </header>
 
+  <section class="memStats">
+    <div class="memStat memStat--green">
+      <span>Activas</span>
+      <strong id="m-statActive">0</strong>
+      <small>Vigentes</small>
+    </div>
+    <div class="memStat memStat--amber">
+      <span>Por vencer</span>
+      <strong id="m-statSoon">0</strong>
+      <small>5 días o menos</small>
+    </div>
+    <div class="memStat memStat--red">
+      <span>Vencidas</span>
+      <strong id="m-statExpired">0</strong>
+      <small>Requieren renovación</small>
+    </div>
+    <div class="memStat memStat--blue">
+      <span>Ingresos</span>
+      <strong id="m-statRevenue">$0</strong>
+      <small>Membresías cobradas</small>
+    </div>
+  </section>
+
   <div class="card catalog" id="mc-card" style="display:none;">
     <div class="card__head">
-      <h2 class="h2">Catálogo de membresías</h2>
-      <div class="muted small">Agrega / edita / borra tipos con días y precio</div>
+      <div>
+        <h2 class="h2">Catálogo de membresías</h2>
+        <div class="muted small">Agrega, edita o borra tipos con días y precio.</div>
+      </div>
     </div>
-    <div class="divider"></div>
 
     <form id="mc-form" class="catalogForm" autocomplete="off">
       <input type="hidden" id="mc-id">
@@ -29,8 +54,7 @@
           <label>Precio</label>
           <input id="mc-price" type="number" min="0" step="0.01" value="0" required>
         </div>
-
-</div>
+      </div>
       <div class="actions">
         <button type="button" class="btn btn--ghost" id="mc-clear">Limpiar</button>
         <button type="submit" class="btn" id="mc-save">Guardar tipo</button>
@@ -42,20 +66,21 @@
   </div>
 
   <div class="mem__grid">
-    <div class="card">
+    <aside class="memPane memPane--form">
       <div class="card__head">
-        <h2 class="h2">Inscribir cliente</h2>
-        <div class="muted small" id="m-mode">Modo: Alta</div>
+        <div>
+          <h2 class="h2">Inscribir / cobrar</h2>
+          <div class="muted small" id="m-mode">Modo: Alta</div>
+        </div>
       </div>
-      <div class="divider"></div>
 
       <form id="m-form" autocomplete="off">
         <div class="field">
-          <label>Cliente (súper buscador)</label>
+          <label>Cliente</label>
           <input id="m-clientSearch" type="text" placeholder="Escribe nombre o teléfono...">
           <div class="pick" id="m-clientPick" style="display:none;"></div>
           <input type="hidden" id="m-clientId">
-          <div class="muted small" id="m-clientPicked"></div>
+          <div class="clientPicked" id="m-clientPicked"></div>
         </div>
 
         <div class="field">
@@ -82,38 +107,35 @@
           </div>
         </div>
 
-        <div class="row2">
+        <div class="row3">
           <div class="field">
             <label>Precio</label>
             <input id="m-price" type="number" readonly>
           </div>
-
-<!-- Forma de pago (inyectado sin reestructurar) -->
-<div class="field" id="membresiaPagoWrap">
-  <label>Forma de pago</label>
-  <select id="membresiaPago" class="input">
-    <option value="efectivo">Efectivo</option>
-    <option value="tarjeta">Tarjeta</option>
-    <option value="transferencia">Transferencia</option>
-  </select>
-</div>
-
+          <div class="field" id="membresiaPagoWrap">
+            <label>Forma de pago</label>
+            <select id="membresiaPago" class="input">
+              <option value="efectivo">Efectivo</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+          </div>
           <div class="field">
             <label>Notas</label>
             <input id="m-notes" type="text" placeholder="Opcional">
           </div>
         </div>
 
-        <div class="actions">
+        <div class="actions actions--main">
           <button type="button" class="btn btn--ghost" id="m-clear">Limpiar</button>
-          <button type="button" class="btn" id="m-save">Guardar</button>
-          <button type="button" class="btn" id="m-charge">Guardar y Cobrar</button>
+          <button type="button" class="btn btn--ghost" id="m-save">Guardar</button>
+          <button type="button" class="btn" id="m-charge">Guardar y cobrar</button>
         </div>
 
-        <div class="row2" style="margin-top:10px;">
+        <div class="ticketControls">
           <label class="chk">
             <input type="checkbox" id="m-makeTicket" checked>
-            <span>Generar ticket (previsualizar)</span>
+            <span>Generar ticket</span>
           </label>
           <button type="button" class="btn btn--ghost" id="m-print" disabled>Imprimir ticket</button>
         </div>
@@ -123,28 +145,30 @@
 
       <div class="ticketBox">
         <div class="ticketHead">
-          <strong>Ticket (previsualización)</strong>
-          <span class="muted small">Solo se imprime si lo pides.</span>
+          <strong>Ticket</strong>
+          <span class="muted small">Previsualización</span>
         </div>
         <div id="m-ticketPreview" class="ticketPreview muted">Sin ticket.</div>
       </div>
-    </div>
+    </aside>
 
-    <div class="card">
+    <main class="memPane memPane--list">
       <div class="card__head">
-        <h2 class="h2">Listado</h2>
+        <div>
+          <h2 class="h2">Listado</h2>
+          <p class="muted small">Clientes con membresía y foto de referencia.</p>
+        </div>
         <div class="filters">
-          <input id="m-search" class="input" placeholder="Buscar por cliente / ID / ticket">
+          <input id="m-search" class="input" placeholder="Cliente / ID / ticket">
           <input id="m-from" class="input" type="date">
           <input id="m-to" class="input" type="date">
           <button class="btn btn--ghost" type="button" id="m-exportCsv">Excel</button>
           <button class="btn btn--ghost" type="button" id="m-exportPdf">PDF</button>
         </div>
       </div>
-      <div class="divider"></div>
 
       <div id="m-list" class="memList"></div>
-      <div class="muted" id="m-empty" style="display:none;">Sin membresías.</div>
-    </div>
+      <div class="muted memEmpty" id="m-empty" style="display:none;">Sin membresías.</div>
+    </main>
   </div>
 </section>

@@ -50,6 +50,10 @@
   const mExportPdf = $("m-exportPdf");
   const mList = $("m-list");
   const mEmpty = $("m-empty");
+  const mStatActive = $("m-statActive");
+  const mStatSoon = $("m-statSoon");
+  const mStatExpired = $("m-statExpired");
+  const mStatRevenue = $("m-statRevenue");
 
   let lastTicketHtml = "";
   let lastTicketTitle = "Ticket";
@@ -61,6 +65,55 @@
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
       .replaceAll(">","&gt;");
+  }
+
+  function getClient(clientId){
+    const st = state();
+    return (st.clients||[]).find(x=>x.id===clientId) || null;
+  }
+
+  function initials(clientId){
+    const c = getClient(clientId);
+    const label = c?.name || clientId || "Cliente";
+    const parts = String(label).trim().split(/\s+/).filter(Boolean);
+    const a = parts[0]?.[0] || "C";
+    const b = parts.length > 1 ? parts[parts.length - 1][0] : "";
+    return (a + b).toUpperCase();
+  }
+
+  function clientAvatarNode(clientId, className="mavatar"){
+    const c = getClient(clientId);
+    if(c?.photo){
+      const img = document.createElement("img");
+      img.className = className;
+      img.alt = "Foto cliente";
+      img.src = c.photo;
+      return img;
+    }
+    const fallback = document.createElement("div");
+    fallback.className = className + "Fallback";
+    fallback.textContent = initials(clientId);
+    return fallback;
+  }
+
+  function daysLeft(endISO){
+    const now = new Date();
+    const e = new Date(endISO);
+    if(isNaN(e.getTime())) return 9999;
+    return Math.floor((e - now) / 86400000);
+  }
+
+  function renderStats(){
+    const st = state();
+    const list = st.memberships || [];
+    const active = list.filter(m=>daysLeft(m.end) > 5).length;
+    const soon = list.filter(m=>{ const d = daysLeft(m.end); return d >= 0 && d <= 5; }).length;
+    const expired = list.filter(m=>daysLeft(m.end) < 0).length;
+    const revenue = list.filter(m=>m.saleTicketId).reduce((sum,m)=>sum + Number(m.price||0), 0);
+    if(mStatActive) mStatActive.textContent = String(active);
+    if(mStatSoon) mStatSoon.textContent = String(soon);
+    if(mStatExpired) mStatExpired.textContent = String(expired);
+    if(mStatRevenue) mStatRevenue.textContent = fmtMoney(revenue);
   }
 
   // ---------- Catalog ----------
@@ -184,7 +237,20 @@
     if(!c) return;
     mClientId.value = c.id;
     mClientSearch.value = c.name || c.id;
-    mClientPicked.textContent = `Seleccionado: ${c.name || c.id} ${c.phone ? " | "+c.phone : ""}`;
+    mClientPicked.innerHTML = "";
+    const card = document.createElement("div");
+    card.className = "clientPickedCard";
+    card.appendChild(clientAvatarNode(c.id, "mavatar"));
+    const info = document.createElement("div");
+    info.innerHTML = `
+      <div class="mtitle">${escapeHtml(c.name || c.id)}</div>
+      <div class="msub">
+        <span class="pill">ID: ${escapeHtml(c.id||"")}</span>
+        ${c.phone ? `<span class="pill">Tel: ${escapeHtml(c.phone)}</span>` : ""}
+      </div>
+    `;
+    card.appendChild(info);
+    mClientPicked.appendChild(card);
     showClientPicker([]);
   }
 
@@ -317,6 +383,7 @@
       saleTicketId: ""
     });
     mStatus.textContent = "Membresía guardada (sin cobro).";
+    renderStats();
     try{ renderList(); }catch(err){ console.error(err); }
   }
 
@@ -340,6 +407,7 @@
     }
 
     mStatus.textContent = "Membresía cobrada. Ticket: " + (ticketId||"");
+    renderStats();
     try{ renderList(); }catch(err){ console.error(err); }
 
     if(mMakeTicket.checked && ticketId){
@@ -404,6 +472,7 @@
     list.slice(0, 400).forEach(m=>{
       const div = document.createElement("div");
       div.className = "mcard";
+      div.appendChild(clientAvatarNode(m.clientId, "mavatar"));
 
       const left = document.createElement("div");
       left.className = "mleft";
@@ -442,6 +511,7 @@
       del.onclick = ()=>{
         if(!confirm(`¿Borrar membresía ${m.id}? (No borra la venta ligada)`)) return;
         dpDeleteMembership(m.id);
+        renderStats();
         renderList();
       };
 
@@ -472,7 +542,7 @@
         (m.notes||"").replaceAll("\n"," ")
       ]);
     });
-    const csv = rows.map(r=>r.map(x=>`"${String(x??"").replaceAll('"','""')}"`).join(",")).join("\n");
+    const csv = rows.map(r=>r.map(x=>`"${String(x ?? "").replaceAll('"','""')}"`).join(",")).join("\n");
     const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -552,5 +622,6 @@ ${Array.from(mList.children).map(n=>`<div class="item">${n.querySelector(".mleft
       sessionStorage.removeItem("dp_prefill_client_id");
     }
   }catch(e){}
+  renderStats();
   renderList();
 })();
