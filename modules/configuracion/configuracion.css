@@ -16,9 +16,9 @@
   grid-template-columns:minmax(0, 1.35fr) minmax(320px, .65fr);
   gap:18px;
   align-items:stretch;
-  padding:22px;
+  padding:18px 22px;
   border:1px solid rgba(201,0,0,.15);
-  border-radius:26px;
+  border-radius:22px;
   background:
     radial-gradient(circle at 12% 10%, rgba(243,167,18,.22), transparent 28%),
     linear-gradient(135deg, #fff 0%, #fff7f2 58%, #ffe9df 100%);
@@ -36,7 +36,7 @@
 }
 .cfgHero h1{
   margin:4px 0 8px;
-  font-size:clamp(32px, 4vw, 54px);
+  font-size:clamp(32px, 3.5vw, 48px);
   line-height:1;
 }
 .cfgHero p{
@@ -47,6 +47,20 @@
   line-height:1.45;
 }
 .cfgHero__actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.cfgHero__actions .btn{
+  min-height:48px;
+  box-shadow:0 12px 24px rgba(201,0,0,.10);
+}
+.cfgHero__actions .btn--ghost{
+  background:#fff;
+  color:#b60000;
+  border-color:#f0b6b6;
+}
+.cfgBackupPrimary{
+  background:#c90000 !important;
+  color:#fff !important;
+  border:1px solid #c90000 !important;
+}
 
 .cfgHero__preview{
   display:flex;
@@ -55,7 +69,7 @@
 }
 .cfgTicketMini{
   width:min(100%, 360px);
-  padding:16px;
+  padding:14px;
   border:1px solid rgba(0,0,0,.08);
   border-radius:18px;
   background:#fff;
@@ -109,10 +123,10 @@
   display:grid;
   grid-template-columns:repeat(4, minmax(0, 1fr));
   gap:12px;
-  margin:16px 0;
+  margin:14px 0;
 }
 .cfgStat{
-  min-height:88px;
+  min-height:78px;
   padding:14px 16px;
   border:1px solid var(--cfg-line);
   border-radius:18px;
@@ -128,7 +142,7 @@
 .cfgStat strong{
   display:block;
   margin-top:7px;
-  font-size:22px;
+  font-size:20px;
   line-height:1.05;
 }
 
@@ -171,7 +185,7 @@
   justify-content:space-between;
   gap:14px;
   align-items:center;
-  padding:14px;
+  padding:12px 14px;
   border:1px solid #f0ded4;
   border-radius:18px;
   background:linear-gradient(135deg, #fff7f3, #fff);
@@ -198,7 +212,9 @@
 .cfgLogoControls .input{
   max-width:230px;
   height:auto;
-  padding:10px;
+  min-height:42px;
+  padding:8px 10px;
+  font-size:13px;
 }
 
 .cfgFormGrid{
@@ -229,8 +245,31 @@
   font-weight:800;
 }
 .config-pro input[type="color"].input{
-  height:50px;
-  padding:5px;
+  height:44px;
+  min-height:44px;
+  padding:4px;
+  border-radius:14px;
+  cursor:pointer;
+}
+.cfgColorField{
+  padding:10px;
+  border:1px solid #eee1db;
+  border-radius:16px;
+  background:#fffaf7;
+}
+.cfgColorField label{
+  display:flex !important;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.cfgColorField label::after{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:#c90000;
+  box-shadow:0 0 0 4px rgba(201,0,0,.08);
 }
 
 .rowBtns,
