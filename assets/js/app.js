@@ -10,6 +10,23 @@ const content = document.getElementById('content');
 
 const menu = document.getElementById('menu');
 const menuToggle = document.getElementById('dp-menuToggle');
+const moduleTitle = document.getElementById('dp-moduleTitle');
+const moduleEyebrow = document.getElementById('dp-moduleEyebrow');
+const moduleLabels = {
+  dashboard: 'Dashboard',
+  ventas: 'Ventas',
+  acceso: 'Acceso',
+  inventario: 'Inventario',
+  bodega: 'Bodega',
+  gastos: 'Gastos',
+  membresias: 'Membresías',
+  clientes: 'Clientes',
+  historial: 'Historial',
+  reportes: 'Reportes',
+  configuracion: 'Configuración',
+  pagina3: 'Página 3.0',
+  pagina: 'Página'
+};
 const dpAuthTemplate = `
   <div id="dp-authOverlay" class="dp-authOverlay" aria-hidden="false">
     <div class="dp-authCard">
@@ -137,6 +154,9 @@ async function loadModule(name){
   const html = await fetch(`modules/${name}/${name}.html`, { cache:"no-store" }).then(r=>r.text());
   content.innerHTML = html;
   document.querySelectorAll('#menu button[data-module]').forEach(x=>x.classList.toggle('active', x.dataset.module===name));
+  document.querySelectorAll('[data-quick-module]').forEach(x=>x.classList.toggle('active', x.dataset.quickModule===name));
+  if(moduleTitle) moduleTitle.textContent = moduleLabels[name] || name;
+  if(moduleEyebrow) moduleEyebrow.textContent = name === 'ventas' ? 'Punto de venta' : 'Dinamita POS';
 
   const script = document.createElement('script');
   script.src = `modules/${name}/${name}.js`;
@@ -144,20 +164,30 @@ async function loadModule(name){
   document.body.appendChild(script);
 }
 
+function dpCanNavigateTo(target){
+  try{
+    const accessMode = sessionStorage.getItem("dp_access_mode")==="1";
+    if(accessMode && target !== "acceso"){
+      const st = (typeof dpGetState === "function") ? dpGetState() : {};
+      const pin = String(st?.meta?.securityPin || "1234");
+      const input = prompt("Modo Acceso activo. Ingresa PIN para navegar:");
+      if(input !== pin) return false;
+    }
+  }catch(e){}
+  return true;
+}
+
 document.querySelectorAll('#menu button[data-module]').forEach(b=>{
   b.addEventListener('click', ()=>{
-    // Modo Acceso: bloquea navegación (salvo Acceso) con PIN
-    try{
-      const accessMode = sessionStorage.getItem("dp_access_mode")==="1";
-      const target = b.dataset.module;
-      if(accessMode && target !== "acceso"){
-        const st = (typeof dpGetState === "function") ? dpGetState() : {};
-        const pin = String(st?.meta?.securityPin || "1234");
-        const input = prompt("Modo Acceso activo. Ingresa PIN para navegar:");
-        if(input !== pin) return;
-      }
-    }catch(e){}
+    if(!dpCanNavigateTo(b.dataset.module)) return;
     loadModule(b.dataset.module);
+  });
+});
+
+document.querySelectorAll('[data-quick-module]').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    if(!dpCanNavigateTo(b.dataset.quickModule)) return;
+    loadModule(b.dataset.quickModule);
   });
 });
 

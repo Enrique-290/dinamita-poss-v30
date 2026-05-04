@@ -115,10 +115,25 @@
         </button>
       </nav>
     </aside>
-    <main id="content"></main>
+    <main id="mainArea">
+      <header class="dp-appTopbar">
+        <div class="dp-topTitle">
+          <span id="dp-moduleEyebrow">Dinamita POS</span>
+          <strong id="dp-moduleTitle">Ventas</strong>
+        </div>
+        <div class="dp-topQuick" aria-label="Accesos rápidos">
+          <button type="button" data-quick-module="ventas">Ventas</button>
+          <button type="button" data-quick-module="clientes">Clientes</button>
+          <button type="button" data-quick-module="membresias">Membresías</button>
+          <button type="button" data-quick-module="reportes">Reportes</button>
+        </div>
+        <button id="dp-logoutBtn" class="dp-userBadge" type="button" title="Cerrar sesión">
+          <span id="dp-currentUser">Sin sesión</span>
+        </button>
+      </header>
+      <section id="content"></section>
+    </main>
   </div>
-
-  <button id="dp-logoutBtn" class="dp-userBadge" type="button" title="Cerrar sesión"><span id="dp-currentUser">Sin sesión</span></button>
 
   <div id="dp-authOverlay" class="dp-authOverlay" hidden>
     <div class="dp-authCard">
