@@ -149,12 +149,24 @@
           </div>
         </div>
 
-        <div class="ticketPreview" id="v-ticketPreview" aria-label="Previsualización de ticket">
-          <div class="muted small">Aquí se mostrará el ticket después de vender o al previsualizar.</div>
-        </div>
-
         <div class="muted small" id="v-status"></div>
       </div>
     </aside>
+  </div>
+
+  <div class="ticketModal" id="v-ticketModal" aria-hidden="true">
+    <div class="ticketModal__backdrop" data-ticket-close="1"></div>
+    <div class="ticketModal__panel" role="dialog" aria-modal="true" aria-label="Comprobante de venta">
+      <div class="ticketModal__head">
+        <strong>Comprobante de venta</strong>
+        <div class="ticketModal__actions">
+          <button class="btn btn--ghost btn--mini" type="button" id="v-modalPrintBtn">Imprimir</button>
+          <button class="btn btn--mini" type="button" id="v-ticketModalClose">Cerrar</button>
+        </div>
+      </div>
+      <div class="ticketPreview ticketPreview--modal" id="v-ticketPreview" aria-label="Previsualización de ticket">
+        <div class="muted small">Aquí se mostrará el ticket después de vender o al previsualizar.</div>
+      </div>
+    </div>
   </div>
 </section>

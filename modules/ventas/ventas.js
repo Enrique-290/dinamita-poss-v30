@@ -46,6 +46,9 @@
   const elPreviewBtn = $("v-previewBtn");
   const elPrintBtn = $("v-printBtn");
   const elTicketPreview = $("v-ticketPreview");
+  const elTicketModal = $("v-ticketModal");
+  const elTicketModalClose = $("v-ticketModalClose");
+  const elModalPrintBtn = $("v-modalPrintBtn");
 
   let cart = []; // [{productId, qty, price}]
   let lastSaleId = null;
@@ -497,10 +500,20 @@
     return `<div class="ticket"><div class="t-title">Ticket ${sale?.id||""}</div></div>`;
   }
 
+  function openTicketModal(){
+    if(elTicketModal) elTicketModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeTicketModal(){
+    if(elTicketModal) elTicketModal.setAttribute("aria-hidden", "true");
+  }
+
   function previewTicketFromCart(){
     if(cart.length === 0){
       elTicketPreview.innerHTML = `<div class="muted small">Carrito vacío. Agrega productos para previsualizar.</div>`;
       elPrintBtn.disabled = true;
+      if(elModalPrintBtn) elModalPrintBtn.disabled = true;
+      openTicketModal();
       return;
     }
     const st = state();
@@ -523,6 +536,8 @@
 
     elTicketPreview.innerHTML = makeTicketFromSale(fakeSale);
     elPrintBtn.disabled = false;
+    if(elModalPrintBtn) elModalPrintBtn.disabled = false;
+    openTicketModal();
   }
 
   function printTicketBySaleId(saleId){
@@ -560,6 +575,7 @@
       const sale = after.sales[0];
       elTicketPreview.innerHTML = makeTicketFromSale(sale);
       elPrintBtn.disabled = false;
+      if(elModalPrintBtn) elModalPrintBtn.disabled = false;
     }
 
     clearCart();
@@ -654,6 +670,16 @@
 
   elPreviewBtn.addEventListener("click", previewTicketFromCart);
   elPrintBtn.addEventListener("click", handlePrint);
+  if(elModalPrintBtn) elModalPrintBtn.addEventListener("click", handlePrint);
+  if(elTicketModalClose) elTicketModalClose.addEventListener("click", closeTicketModal);
+  if(elTicketModal){
+    elTicketModal.addEventListener("click", (ev)=>{
+      if(ev.target?.getAttribute?.("data-ticket-close")==="1") closeTicketModal();
+    });
+  }
+  window.addEventListener("keydown", (ev)=>{
+    if(ev.key === "Escape") closeTicketModal();
+  });
     // Defaults
     if(elClient){ elClient.value = (Array.from(elClient.options).some(o=>o.value==="GEN") ? "GEN" : (elClient.options[0]?.value||"")); }
     if(elPayMethod){ elPayMethod.value = "efectivo"; }

@@ -328,8 +328,8 @@
   min-height:82px;
 }
 .ventas-pos .ventasPane--ticket > .field textarea{
-  min-height:64px;
-  max-height:92px;
+  min-height:38px;
+  max-height:44px;
   resize:none;
 }
 .ventas-pos .catalogHead{
@@ -437,7 +437,7 @@
 }
 .ventas-pos .btn--sell{
   width:100%;
-  min-height:54px;
+  min-height:50px;
   font-size:17px;
   background:linear-gradient(135deg,var(--v-red),var(--v-red-dark));
   box-shadow:0 14px 28px rgba(215,25,42,.20);
@@ -463,7 +463,7 @@
   display:flex;
   flex-direction:column;
   gap:10px;
-  min-height:120px;
+  min-height:230px;
   max-height:none;
   flex:1 1 auto;
   overflow:auto;
@@ -481,15 +481,17 @@
 .ventas-pos .citem{
   border:1px solid var(--v-line);
   border-radius:8px;
-  padding:12px;
+  padding:10px 11px;
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
-  gap:12px;
+  gap:10px;
   background:#fff;
 }
 .ventas-pos .cleft .ctitle{
   font-weight:1000;
-  margin-bottom:4px;
+  margin-bottom:3px;
+  font-size:16px;
+  line-height:1.15;
 }
 .ventas-pos .qty{
   display:flex;
@@ -581,14 +583,79 @@
   flex-wrap:wrap;
 }
 .ventas-pos .ticketPreview{
-  margin-top:10px;
   border:1px dashed #cfd6e3;
   border-radius:8px;
   padding:12px;
   background:var(--v-soft);
-  min-height:72px;
-  max-height:130px;
+  min-height:120px;
+  max-height:none;
   overflow:auto;
+}
+
+.ventas-pos .ticketModal{
+  position:fixed;
+  inset:0;
+  z-index:130;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+}
+.ventas-pos .ticketModal[aria-hidden="false"]{ display:flex; }
+.ventas-pos .ticketModal__backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(15,23,42,.56);
+  backdrop-filter:blur(4px);
+}
+.ventas-pos .ticketModal__panel{
+  position:relative;
+  width:min(560px,100%);
+  max-height:calc(100vh - 44px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 28px 80px rgba(15,23,42,.35);
+}
+.ventas-pos .ticketModal__head{
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 18px;
+  background:linear-gradient(135deg,var(--v-red),var(--v-red-dark));
+  color:#fff;
+}
+.ventas-pos .ticketModal__head strong{ font-size:18px; }
+.ventas-pos .ticketModal__actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.ventas-pos .ticketModal__actions .btn--ghost{
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  border-color:rgba(255,255,255,.35);
+}
+.ventas-pos .ticketPreview--modal{
+  margin:0;
+  padding:24px;
+  border:0;
+  border-radius:0;
+  background:#f8fafc;
+  overflow:auto;
+}
+.ventas-pos .ticketPreview--modal .ticket{
+  width:58mm;
+  max-width:100%;
+  margin:0 auto;
+  padding:18px;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(15,23,42,.10);
 }
 .ventas-pos .ticket{
   font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
