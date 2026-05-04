@@ -25,6 +25,8 @@
   const elCloseCashQuick = $("v-closeCashQuick");
   const elCashExpected = $("v-cashExpected");
   const elPrintLastCashBtn = $("v-printLastCashBtn");
+  const elCashBox = $("v-cashBox");
+  const elCashToggle = $("v-cashToggle");
 
   const elClient = $("v-client");
   const elPayMethod = $("v-payMethod");
@@ -69,6 +71,17 @@
     return sessions
       .filter(s=>s.status === "closed")
       .sort((a,b)=>String(b.closedAt || b.openedAt || "").localeCompare(String(a.closedAt || a.openedAt || "")))[0] || null;
+  }
+
+  function setCashCollapsed(collapsed){
+    if(!elCashBox) return;
+    elCashBox.classList.toggle("is-collapsed", !!collapsed);
+    if(elCashToggle) elCashToggle.textContent = collapsed ? "Detalles" : "Ocultar";
+    try{ localStorage.setItem("dp_ventas_cash_collapsed", collapsed ? "1" : "0"); }catch(e){}
+  }
+
+  function isCashCollapsed(){
+    return !!elCashBox?.classList.contains("is-collapsed");
   }
 
   function renderCashBox(){
@@ -118,6 +131,11 @@
   }
 
   function openCash(){
+    if(isCashCollapsed() && elOpenCashAmount && !elOpenCashAmount.value){
+      setCashCollapsed(false);
+      setTimeout(()=>elOpenCashAmount.focus(), 20);
+      return;
+    }
     const raw = elOpenCashAmount ? elOpenCashAmount.value : prompt("Fondo inicial de caja:", "0");
     if(raw === null) return;
     try{
@@ -133,6 +151,11 @@
   function closeCash(){
     const session = (typeof dpGetActiveCashSession === "function") ? dpGetActiveCashSession() : null;
     if(!session){ alert("No hay caja abierta."); return; }
+    if(isCashCollapsed() && elCloseCashAmount){
+      setCashCollapsed(false);
+      setTimeout(()=>elCloseCashAmount.focus(), 20);
+      return;
+    }
     const expected = Number(session.openingAmount || 0) + Number(session?.totals?.byPayment?.efectivo || 0);
     const countedRaw = elCloseCashAmount ? elCloseCashAmount.value : prompt(`Dinero contado en caja. Esperado: ${dpFmtMoney(expected)}`, String(expected));
     if(countedRaw === null) return;
@@ -602,6 +625,9 @@
   renderCart();
   renderTotals();
   renderCashBox();
+  let initialCashCollapsed = true;
+  try{ initialCashCollapsed = localStorage.getItem("dp_ventas_cash_collapsed") !== "0"; }catch(e){}
+  setCashCollapsed(initialCashCollapsed);
 
   elSearch.addEventListener("input", handleSearchInput);
   elView.addEventListener("change", renderCatalog);
@@ -613,6 +639,7 @@
   if(elOpenCashQuick) elOpenCashQuick.addEventListener("click", openCash);
   if(elCloseCashQuick) elCloseCashQuick.addEventListener("click", closeCash);
   if(elPrintLastCashBtn) elPrintLastCashBtn.addEventListener("click", printLastCashCut);
+  if(elCashToggle) elCashToggle.addEventListener("click", ()=>setCashCollapsed(!isCashCollapsed()));
 
   document.querySelectorAll("[data-pay]").forEach(btn=>{
     btn.addEventListener("click", ()=>{

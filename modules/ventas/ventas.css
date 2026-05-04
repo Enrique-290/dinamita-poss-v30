@@ -134,15 +134,37 @@
 }
 .ventas-pos .ventasPane--ticket{
   position:sticky;
-  top:14px;
+  top:86px;
+  max-height:calc(100vh - 104px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
 }
 
 .ventas-pos .cashBox{
   margin-bottom:14px;
   border:1px solid rgba(215,25,42,.16);
   border-radius:8px;
-  padding:14px;
+  padding:12px 14px;
   background:linear-gradient(135deg,#fff7f7 0%,#ffffff 55%,#f7fbff 100%);
+}
+.ventas-pos .cashBox.is-collapsed{
+  padding:10px 12px;
+}
+.ventas-pos .cashBox.is-collapsed .cashBox__body{
+  display:none;
+}
+.ventas-pos .cashBox.is-collapsed .cashBox__head{
+  align-items:center;
+}
+.ventas-pos .cashBox.is-collapsed h2{
+  font-size:15px;
+}
+.ventas-pos .cashBox.is-collapsed #v-cashStatus{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:520px;
 }
 .ventas-pos .cashBox__head,
 .ventas-pos .ticketTop,
@@ -305,6 +327,11 @@
   resize:vertical;
   min-height:82px;
 }
+.ventas-pos .ventasPane--ticket > .field textarea{
+  min-height:64px;
+  max-height:92px;
+  resize:none;
+}
 .ventas-pos .catalogHead{
   margin:16px 0 10px;
 }
@@ -436,8 +463,9 @@
   display:flex;
   flex-direction:column;
   gap:10px;
-  min-height:96px;
-  max-height:330px;
+  min-height:120px;
+  max-height:none;
+  flex:1 1 auto;
   overflow:auto;
   padding-right:2px;
   margin-bottom:12px;
@@ -486,9 +514,9 @@
 }
 .ventas-pos .totals{
   display:grid;
-  gap:8px;
-  padding:14px;
-  margin-top:12px;
+  gap:6px;
+  padding:12px;
+  margin-top:0;
   border:1px solid rgba(215,25,42,.16);
   border-radius:8px;
   background:linear-gradient(135deg,#fff7f7 0%,#fff 65%);
@@ -512,18 +540,26 @@
 }
 .ventas-pos .totals__row--big strong{
   color:var(--v-red);
-  font-size:26px;
+  font-size:24px;
 }
 .ventas-pos .actions{
-  margin-top:12px;
+  margin-top:10px;
+}
+.ventas-pos .ticketCheckoutSticky{
+  flex:0 0 auto;
+  margin-top:auto;
+  padding-top:10px;
+  background:linear-gradient(180deg,rgba(255,255,255,.86),#fff 20%);
+  border-top:1px solid rgba(231,235,242,.9);
+  box-shadow:0 -14px 28px rgba(15,23,42,.05);
 }
 .ventas-pos .ticketControls{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  margin-top:12px;
-  padding:12px;
+  margin-top:10px;
+  padding:10px;
   border:1px solid var(--v-line);
   border-radius:8px;
   background:#fff;
@@ -545,12 +581,14 @@
   flex-wrap:wrap;
 }
 .ventas-pos .ticketPreview{
-  margin-top:12px;
+  margin-top:10px;
   border:1px dashed #cfd6e3;
   border-radius:8px;
   padding:12px;
   background:var(--v-soft);
-  min-height:120px;
+  min-height:72px;
+  max-height:130px;
+  overflow:auto;
 }
 .ventas-pos .ticket{
   font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;

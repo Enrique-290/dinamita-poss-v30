@@ -29,8 +29,10 @@
           <div class="ticketBtns">
             <button class="btn btn--ghost btn--mini" id="v-openCashBtn">Abrir caja</button>
             <button class="btn btn--mini" id="v-closeCashBtn">Cerrar caja</button>
+            <button class="btn btn--ghost btn--mini" type="button" id="v-cashToggle">Detalles</button>
           </div>
         </div>
+        <div class="cashBox__body" id="v-cashBody">
         <div class="cashBox__grid" id="v-cashSummary"></div>
 
         <div class="cashControl">
@@ -60,6 +62,7 @@
             <strong id="v-cashExpected">$0.00</strong>
           </div>
           <button class="btn btn--ghost btn--mini" type="button" id="v-printLastCashBtn">Reimprimir último corte</button>
+        </div>
         </div>
       </div>
 
@@ -124,32 +127,34 @@
         <textarea id="v-note" rows="3" placeholder="Nota para el ticket..."></textarea>
       </div>
 
-      <div class="totals">
-        <div class="totals__row"><span>Subtotal</span><strong id="v-subtotal">$0</strong></div>
-        <div class="totals__row"><span>IVA</span><strong id="v-ivaAmount">$0</strong></div>
-        <div class="totals__row totals__row--big"><span>Total</span><strong id="v-total">$0</strong></div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn--sell" id="v-sell">Vender</button>
-      </div>
-
-      <div class="ticketControls">
-        <label class="chk">
-          <input type="checkbox" id="v-requireTicket">
-          <span>Generar ticket al vender</span>
-        </label>
-        <div class="ticketBtns">
-          <button class="btn btn--ghost btn--mini" id="v-previewBtn">Previsualizar</button>
-          <button class="btn btn--mini" id="v-printBtn" disabled>Imprimir</button>
+      <div class="ticketCheckoutSticky">
+        <div class="totals">
+          <div class="totals__row"><span>Subtotal</span><strong id="v-subtotal">$0</strong></div>
+          <div class="totals__row"><span>IVA</span><strong id="v-ivaAmount">$0</strong></div>
+          <div class="totals__row totals__row--big"><span>Total</span><strong id="v-total">$0</strong></div>
         </div>
-      </div>
 
-      <div class="ticketPreview" id="v-ticketPreview" aria-label="Previsualización de ticket">
-        <div class="muted small">Aquí se mostrará el ticket después de vender o al previsualizar.</div>
-      </div>
+        <div class="actions">
+          <button class="btn btn--sell" id="v-sell">Vender</button>
+        </div>
 
-      <div class="muted small" id="v-status"></div>
+        <div class="ticketControls">
+          <label class="chk">
+            <input type="checkbox" id="v-requireTicket">
+            <span>Generar ticket al vender</span>
+          </label>
+          <div class="ticketBtns">
+            <button class="btn btn--ghost btn--mini" id="v-previewBtn">Previsualizar</button>
+            <button class="btn btn--mini" id="v-printBtn" disabled>Imprimir</button>
+          </div>
+        </div>
+
+        <div class="ticketPreview" id="v-ticketPreview" aria-label="Previsualización de ticket">
+          <div class="muted small">Aquí se mostrará el ticket después de vender o al previsualizar.</div>
+        </div>
+
+        <div class="muted small" id="v-status"></div>
+      </div>
     </aside>
   </div>
 </section>
