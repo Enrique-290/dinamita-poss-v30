@@ -18,15 +18,6 @@
   const elCashSummary = $("v-cashSummary");
   const elOpenCashBtn = $("v-openCashBtn");
   const elCloseCashBtn = $("v-closeCashBtn");
-  const elOpenCashAmount = $("v-openCashAmount");
-  const elCloseCashAmount = $("v-closeCashAmount");
-  const elCloseCashNotes = $("v-closeCashNotes");
-  const elOpenCashQuick = $("v-openCashQuick");
-  const elCloseCashQuick = $("v-closeCashQuick");
-  const elCashExpected = $("v-cashExpected");
-  const elPrintLastCashBtn = $("v-printLastCashBtn");
-  const elCashBox = $("v-cashBox");
-  const elCashToggle = $("v-cashToggle");
 
   const elClient = $("v-client");
   const elPayMethod = $("v-payMethod");
@@ -46,9 +37,6 @@
   const elPreviewBtn = $("v-previewBtn");
   const elPrintBtn = $("v-printBtn");
   const elTicketPreview = $("v-ticketPreview");
-  const elTicketModal = $("v-ticketModal");
-  const elTicketModalClose = $("v-ticketModalClose");
-  const elModalPrintBtn = $("v-modalPrintBtn");
 
   let cart = []; // [{productId, qty, price}]
   let lastSaleId = null;
@@ -62,94 +50,39 @@
     return d.toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
   }
 
-  function cashExpenses(sessionId){
-    const st = state();
-    return (st.expenses || [])
-      .filter(x=>String(x?.cashSessionId || "") === String(sessionId || ""))
-      .reduce((sum,x)=>sum + Number(x?.amount || 0), 0);
-  }
-
-  function lastClosedCashSession(){
-    const sessions = (typeof dpGetCashSessions === "function") ? dpGetCashSessions() : [];
-    return sessions
-      .filter(s=>s.status === "closed")
-      .sort((a,b)=>String(b.closedAt || b.openedAt || "").localeCompare(String(a.closedAt || a.openedAt || "")))[0] || null;
-  }
-
-  function setCashCollapsed(collapsed){
-    if(!elCashBox) return;
-    elCashBox.classList.toggle("is-collapsed", !!collapsed);
-    if(elCashToggle) elCashToggle.textContent = collapsed ? "Detalles" : "Ocultar";
-    try{ localStorage.setItem("dp_ventas_cash_collapsed", collapsed ? "1" : "0"); }catch(e){}
-  }
-
-  function isCashCollapsed(){
-    return !!elCashBox?.classList.contains("is-collapsed");
-  }
-
   function renderCashBox(){
     const session = (typeof dpGetActiveCashSession === "function") ? dpGetActiveCashSession() : null;
     if(!session){
       if(elCashStatus) elCashStatus.textContent = "No hay caja abierta. Abre caja para vender.";
       if(elCashSummary) elCashSummary.innerHTML = `
-        <div class="cashMetric"><span>Estado</span><strong>Cerrada</strong></div>
-        <div class="cashMetric"><span>Ventas turno</span><strong>$0.00</strong></div>
-        <div class="cashMetric"><span>Usuario</span><strong>—</strong></div>
+        <div class="pill">Estado: cerrada</div>
+        <div class="pill">Ventas turno: $0.00</div>
+        <div class="pill">Usuario: —</div>
       `;
-      if(elCashExpected) elCashExpected.textContent = dpFmtMoney(0);
-      if(elCloseCashAmount) elCloseCashAmount.value = "";
-      if(elCloseCashNotes) elCloseCashNotes.value = "";
       if(elSell) elSell.disabled = true;
       if(elOpenCashBtn) elOpenCashBtn.disabled = false;
       if(elCloseCashBtn) elCloseCashBtn.disabled = true;
-      if(elOpenCashQuick) elOpenCashQuick.disabled = false;
-      if(elCloseCashQuick) elCloseCashQuick.disabled = true;
-      if(elPrintLastCashBtn) elPrintLastCashBtn.disabled = !lastClosedCashSession();
       return;
     }
     if(elCashStatus) elCashStatus.textContent = `Caja abierta por ${session.userName || 'Usuario'} desde ${fmtCashTime(session.openedAt)}.`;
-    const byPay = session?.totals?.byPayment || {};
-    const efectivo = Number(byPay.efectivo || 0);
-    const expensesRows = (state().expenses || []).filter(x=>String(x?.cashSessionId || "") === String(session.id || ""));
-    const expenses = expensesRows.reduce((sum,x)=>sum + Number(x?.amount || 0), 0);
-    const cashExpenses = expensesRows
-      .filter(x=>String(x?.payment || "").toLowerCase() === "efectivo")
-      .reduce((sum,x)=>sum + Number(x?.amount || 0), 0);
-    const expected = Number(session.openingAmount || 0) + efectivo - cashExpenses;
-    const net = Number(session?.totals?.total || 0) - expenses;
     if(elCashSummary) elCashSummary.innerHTML = `
-      <div class="cashMetric cashMetric--info"><span>Fondo</span><strong>${dpFmtMoney(session.openingAmount || 0)}</strong></div>
-      <div class="cashMetric"><span>Productos</span><strong>${dpFmtMoney(session?.totals?.sales || 0)}</strong></div>
-      <div class="cashMetric"><span>Membresías</span><strong>${dpFmtMoney(session?.totals?.memberships || 0)}</strong></div>
-      <div class="cashMetric"><span>Efectivo</span><strong>${dpFmtMoney(efectivo)}</strong></div>
-      <div class="cashMetric"><span>Tarjeta</span><strong>${dpFmtMoney(byPay.tarjeta || 0)}</strong></div>
-      <div class="cashMetric"><span>Transferencia</span><strong>${dpFmtMoney(byPay.transferencia || 0)}</strong></div>
-      <div class="cashMetric cashMetric--warn"><span>Gastos</span><strong>${dpFmtMoney(expenses)}</strong></div>
-      <div class="cashMetric cashMetric--ok"><span>Neto</span><strong>${dpFmtMoney(net)}</strong></div>
+      <div class="pill">Fondo inicial: ${dpFmtMoney(session.openingAmount || 0)}</div>
+      <div class="pill">Ventas: ${dpFmtMoney(session?.totals?.sales || 0)}</div>
+      <div class="pill">Membresías: ${dpFmtMoney(session?.totals?.memberships || 0)}</div>
+      <div class="pill">Total: ${dpFmtMoney(session?.totals?.total || 0)}</div>
     `;
-    if(elCashExpected) elCashExpected.textContent = dpFmtMoney(expected);
-    if(elCloseCashAmount && !elCloseCashAmount.value) elCloseCashAmount.value = String(expected.toFixed(2));
     if(elSell) elSell.disabled = false;
     if(elOpenCashBtn) elOpenCashBtn.disabled = true;
     if(elCloseCashBtn) elCloseCashBtn.disabled = false;
-    if(elOpenCashQuick) elOpenCashQuick.disabled = true;
-    if(elCloseCashQuick) elCloseCashQuick.disabled = false;
-    if(elPrintLastCashBtn) elPrintLastCashBtn.disabled = false;
   }
 
   function openCash(){
-    if(isCashCollapsed() && elOpenCashAmount && !elOpenCashAmount.value){
-      setCashCollapsed(false);
-      setTimeout(()=>elOpenCashAmount.focus(), 20);
-      return;
-    }
-    const raw = elOpenCashAmount ? elOpenCashAmount.value : prompt("Fondo inicial de caja:", "0");
+    const raw = prompt("Fondo inicial de caja:", "0");
     if(raw === null) return;
     try{
       const amount = Number(raw || 0);
       if(!Number.isFinite(amount) || amount < 0){ alert("Monto inválido."); return; }
       dpOpenCashSession({ openingAmount: amount });
-      if(elOpenCashAmount) elOpenCashAmount.value = "";
       setStatus("Caja abierta correctamente.", "success");
       renderCashBox();
     }catch(err){ alert(err?.message || "No se pudo abrir caja."); }
@@ -158,18 +91,10 @@
   function closeCash(){
     const session = (typeof dpGetActiveCashSession === "function") ? dpGetActiveCashSession() : null;
     if(!session){ alert("No hay caja abierta."); return; }
-    if(isCashCollapsed() && elCloseCashAmount){
-      setCashCollapsed(false);
-      setTimeout(()=>elCloseCashAmount.focus(), 20);
-      return;
-    }
-    const cashExpenses = (state().expenses || [])
-      .filter(x=>String(x?.cashSessionId || "") === String(session.id || "") && String(x?.payment || "").toLowerCase() === "efectivo")
-      .reduce((sum,x)=>sum + Number(x?.amount || 0), 0);
-    const expected = Number(session.openingAmount || 0) + Number(session?.totals?.byPayment?.efectivo || 0) - cashExpenses;
-    const countedRaw = elCloseCashAmount ? elCloseCashAmount.value : prompt(`Dinero contado en caja. Esperado: ${dpFmtMoney(expected)}`, String(expected));
+    const expected = Number(session.openingAmount || 0) + Number(session?.totals?.byPayment?.efectivo || 0);
+    const countedRaw = prompt(`Dinero contado en caja. Esperado: ${dpFmtMoney(expected)}`, String(expected));
     if(countedRaw === null) return;
-    const notes = elCloseCashNotes ? elCloseCashNotes.value : (prompt("Observaciones del cierre (opcional):", "Cierre sin faltantes.") || "");
+    const notes = prompt("Observaciones del cierre (opcional):", session?.difference===0 ? "Cierre sin faltantes." : "") || "";
     try{
       const counted = Number(countedRaw || 0);
       if(!Number.isFinite(counted) || counted < 0){ alert("Monto inválido."); return; }
@@ -185,14 +110,6 @@
         }
       }, 20);
     }catch(err){ alert(err?.message || "No se pudo cerrar caja."); }
-  }
-
-  function printLastCashCut(){
-    const session = lastClosedCashSession();
-    if(!session){ alert("No hay cortes para imprimir."); return; }
-    if(typeof dpPrintCashCloseTicketBySessionId !== "function"){ alert("La impresión de cortes no está disponible."); return; }
-    const ok = dpPrintCashCloseTicketBySessionId(session.id);
-    if(!ok) alert("No se encontró el corte para imprimir.");
   }
 
   function renderClients(){
@@ -507,20 +424,10 @@
     return `<div class="ticket"><div class="t-title">Ticket ${sale?.id||""}</div></div>`;
   }
 
-  function openTicketModal(){
-    if(elTicketModal) elTicketModal.setAttribute("aria-hidden", "false");
-  }
-
-  function closeTicketModal(){
-    if(elTicketModal) elTicketModal.setAttribute("aria-hidden", "true");
-  }
-
   function previewTicketFromCart(){
     if(cart.length === 0){
       elTicketPreview.innerHTML = `<div class="muted small">Carrito vacío. Agrega productos para previsualizar.</div>`;
       elPrintBtn.disabled = true;
-      if(elModalPrintBtn) elModalPrintBtn.disabled = true;
-      openTicketModal();
       return;
     }
     const st = state();
@@ -543,8 +450,6 @@
 
     elTicketPreview.innerHTML = makeTicketFromSale(fakeSale);
     elPrintBtn.disabled = false;
-    if(elModalPrintBtn) elModalPrintBtn.disabled = false;
-    openTicketModal();
   }
 
   function printTicketBySaleId(saleId){
@@ -582,7 +487,6 @@
       const sale = after.sales[0];
       elTicketPreview.innerHTML = makeTicketFromSale(sale);
       elPrintBtn.disabled = false;
-      if(elModalPrintBtn) elModalPrintBtn.disabled = false;
     }
 
     clearCart();
@@ -648,9 +552,6 @@
   renderCart();
   renderTotals();
   renderCashBox();
-  let initialCashCollapsed = true;
-  try{ initialCashCollapsed = localStorage.getItem("dp_ventas_cash_collapsed") !== "0"; }catch(e){}
-  setCashCollapsed(initialCashCollapsed);
 
   elSearch.addEventListener("input", handleSearchInput);
   elView.addEventListener("change", renderCatalog);
@@ -659,34 +560,9 @@
   elSell.addEventListener("click", doSell);
   if(elOpenCashBtn) elOpenCashBtn.addEventListener("click", openCash);
   if(elCloseCashBtn) elCloseCashBtn.addEventListener("click", closeCash);
-  if(elOpenCashQuick) elOpenCashQuick.addEventListener("click", openCash);
-  if(elCloseCashQuick) elCloseCashQuick.addEventListener("click", closeCash);
-  if(elPrintLastCashBtn) elPrintLastCashBtn.addEventListener("click", printLastCashCut);
-  if(elCashToggle) elCashToggle.addEventListener("click", ()=>setCashCollapsed(!isCashCollapsed()));
-
-  document.querySelectorAll("[data-pay]").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const method = btn.getAttribute("data-pay");
-      if(elPayMethod && method){
-        elPayMethod.value = method;
-        document.querySelectorAll("[data-pay]").forEach(x=>x.classList.toggle("is-active", x === btn));
-        setStatus(`Forma de pago seleccionada: ${method}.`, "success");
-      }
-    });
-  });
 
   elPreviewBtn.addEventListener("click", previewTicketFromCart);
   elPrintBtn.addEventListener("click", handlePrint);
-  if(elModalPrintBtn) elModalPrintBtn.addEventListener("click", handlePrint);
-  if(elTicketModalClose) elTicketModalClose.addEventListener("click", closeTicketModal);
-  if(elTicketModal){
-    elTicketModal.addEventListener("click", (ev)=>{
-      if(ev.target?.getAttribute?.("data-ticket-close")==="1") closeTicketModal();
-    });
-  }
-  window.addEventListener("keydown", (ev)=>{
-    if(ev.key === "Escape") closeTicketModal();
-  });
     // Defaults
     if(elClient){ elClient.value = (Array.from(elClient.options).some(o=>o.value==="GEN") ? "GEN" : (elClient.options[0]?.value||"")); }
     if(elPayMethod){ elPayMethod.value = "efectivo"; }
@@ -740,3 +616,5 @@ function dpPrintHTML(html){
   // Safety fallback (in case onload doesn't fire reliably)
   setTimeout(tryPrint, 600);
 }
+
+

@@ -1,0 +1,18 @@
+Dinamita POS v30.5.6 - correccion cache / imagenes
+
+Cambios aplicados:
+- Service Worker actualizado con version nueva.
+- Limpieza automatica de caches anteriores dinamita-pos-*.
+- Cache completo para Pagina 3.0.
+- Cache-busting en CSS, JS, manifest e iconos.
+- Carga de modulos con version para evitar archivos viejos.
+- Registro de Service Worker con actualizacion limpia.
+
+Recomendacion al subir a Vercel:
+1. Subir esta version a un repo/proyecto de prueba primero.
+2. Abrir la pagina y presionar Ctrl + F5 una vez.
+3. En celular, si no actualiza, cerrar la PWA/app y abrir de nuevo.
+4. Si sigue mostrando version vieja, borrar datos del sitio en Chrome.
+
+Nota:
+Los datos de ventas/inventario/imagenes subidas desde la app viven en localStorage del dominio. Si cambias de dominio, exporta respaldo JSON primero e importalo en el nuevo dominio.

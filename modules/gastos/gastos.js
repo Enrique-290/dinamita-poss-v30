@@ -197,18 +197,8 @@
     const hoy = s.expenses.filter(e=>String(e.date||'')===today).reduce((a,b)=>a+Number(b.amount||0),0);
     const mes = s.expenses.filter(e=>String(e.date||'').slice(0,7)===month).reduce((a,b)=>a+Number(b.amount||0),0);
     const total = s.expenses.reduce((a,b)=>a+Number(b.amount||0),0);
-    const byCategory = {};
-    s.expenses.forEach(e=>{
-      const cat = e.category || 'otros';
-      byCategory[cat] = (byCategory[cat] || 0) + Number(e.amount || 0);
-    });
-    const topCategory = Object.entries(byCategory)
-      .map(([name, amount])=>({ name, amount }))
-      .sort((a,b)=>b.amount-a.amount)[0];
     $('g-kpi-hoy').textContent = money(hoy);
     $('g-kpi-mes').textContent = money(mes);
-    $('g-kpi-topcat').textContent = money(topCategory?.amount || 0);
-    $('g-kpi-topcat-label').textContent = topCategory ? topCategory.name : 'Sin datos';
     $('g-kpi-total').textContent = money(total);
   }
 

@@ -1,6 +1,8 @@
 try{ dpEnsureSeedData(); }catch(e){ console.warn(e); }
 try{ dpApplyTheme(); }catch(e){ console.warn(e); }
 try{ dpRenderBranding(); }catch(e){ console.warn(e); }
+const DP_APP_VERSION = window.DP_APP_VERSION || '30.5.6-cachefix-20260505';
+const dpModuleHtmlCache = new Map();
 /* Dinamita POS v0 - App Loader
    Versión: v0.1.1
    Fecha: 2025-12-15
@@ -10,23 +12,6 @@ const content = document.getElementById('content');
 
 const menu = document.getElementById('menu');
 const menuToggle = document.getElementById('dp-menuToggle');
-const moduleTitle = document.getElementById('dp-moduleTitle');
-const moduleEyebrow = document.getElementById('dp-moduleEyebrow');
-const moduleLabels = {
-  dashboard: 'Dashboard',
-  ventas: 'Ventas',
-  acceso: 'Acceso',
-  inventario: 'Inventario',
-  bodega: 'Bodega',
-  gastos: 'Gastos',
-  membresias: 'Membresías',
-  clientes: 'Clientes',
-  historial: 'Historial',
-  reportes: 'Reportes',
-  configuracion: 'Configuración',
-  pagina3: 'Página 3.0',
-  pagina: 'Página'
-};
 const dpAuthTemplate = `
   <div id="dp-authOverlay" class="dp-authOverlay" aria-hidden="false">
     <div class="dp-authCard">
@@ -151,43 +136,34 @@ async function loadModule(name){
   }
   dpClearModuleAssets();
 
-  const html = await fetch(`modules/${name}/${name}.html`, { cache:"no-store" }).then(r=>r.text());
+  let html = dpModuleHtmlCache.get(name);
+  if(!html){
+    html = await fetch(`modules/${name}/${name}.html?v=${encodeURIComponent(DP_APP_VERSION)}`, { cache:"no-store" }).then(r=>r.text());
+    dpModuleHtmlCache.set(name, html);
+  }
   content.innerHTML = html;
   document.querySelectorAll('#menu button[data-module]').forEach(x=>x.classList.toggle('active', x.dataset.module===name));
-  document.querySelectorAll('[data-quick-module]').forEach(x=>x.classList.toggle('active', x.dataset.quickModule===name));
-  if(moduleTitle) moduleTitle.textContent = moduleLabels[name] || name;
-  if(moduleEyebrow) moduleEyebrow.textContent = name === 'ventas' ? 'Punto de venta' : 'Dinamita POS';
 
   const script = document.createElement('script');
-  script.src = `modules/${name}/${name}.js`;
+  script.src = `modules/${name}/${name}.js?v=${encodeURIComponent(DP_APP_VERSION)}`;
   script.setAttribute("data-dp-module-js","1");
   document.body.appendChild(script);
 }
 
-function dpCanNavigateTo(target){
-  try{
-    const accessMode = sessionStorage.getItem("dp_access_mode")==="1";
-    if(accessMode && target !== "acceso"){
-      const st = (typeof dpGetState === "function") ? dpGetState() : {};
-      const pin = String(st?.meta?.securityPin || "1234");
-      const input = prompt("Modo Acceso activo. Ingresa PIN para navegar:");
-      if(input !== pin) return false;
-    }
-  }catch(e){}
-  return true;
-}
-
 document.querySelectorAll('#menu button[data-module]').forEach(b=>{
   b.addEventListener('click', ()=>{
-    if(!dpCanNavigateTo(b.dataset.module)) return;
+    // Modo Acceso: bloquea navegación (salvo Acceso) con PIN
+    try{
+      const accessMode = sessionStorage.getItem("dp_access_mode")==="1";
+      const target = b.dataset.module;
+      if(accessMode && target !== "acceso"){
+        const st = (typeof dpGetState === "function") ? dpGetState() : {};
+        const pin = String(st?.meta?.securityPin || "1234");
+        const input = prompt("Modo Acceso activo. Ingresa PIN para navegar:");
+        if(input !== pin) return;
+      }
+    }catch(e){}
     loadModule(b.dataset.module);
-  });
-});
-
-document.querySelectorAll('[data-quick-module]').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    if(!dpCanNavigateTo(b.dataset.quickModule)) return;
-    loadModule(b.dataset.quickModule);
   });
 });
 
@@ -208,11 +184,32 @@ document.querySelectorAll('[data-quick-module]').forEach(b=>{
 })();
 
 
-// PWA: Service Worker
+// PWA: Service Worker con actualización limpia
 (function registerServiceWorker(){
   if (!('serviceWorker' in navigator)) return;
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    // Solo recarga cuando el service worker nuevo toma control.
+    window.location.reload();
+  });
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch((err) => {
+    navigator.serviceWorker.register(`./sw.js?v=${encodeURIComponent(DP_APP_VERSION)}`).then((registration) => {
+      registration.update().catch(()=>{});
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+      registration.addEventListener('updatefound', () => {
+        const worker = registration.installing;
+        if (!worker) return;
+        worker.addEventListener('statechange', () => {
+          if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+            worker.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+    }).catch((err) => {
       console.warn('SW registration failed:', err);
     });
   });

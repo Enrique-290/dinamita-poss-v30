@@ -1,65 +1,42 @@
-<section class="bodega bodega-pro">
-  <header class="bodHero">
-    <div class="bodHero__copy">
-      <span class="bodHero__eyebrow">Control de almacén</span>
+<section class="bodega">
+  <header class="bod__header">
+    <div>
       <h1>Bodega</h1>
-      <p>Administra mercancía separada de inventario, registra entradas y traspasa piezas a mostrador cuando las necesites.</p>
-      <div class="bodHero__actions">
-        <button type="button" class="btn" id="b-exportCsv">Exportar Excel/CSV</button>
-        <button type="button" class="btn btn--ghost" id="b-exportPdf">Imprimir / PDF</button>
-      </div>
-    </div>
-    <div class="bodHero__stats">
-      <div class="bodStat">
-        <span>Piezas en bodega</span>
-        <strong id="b-statQty">0</strong>
-      </div>
-      <div class="bodStat">
-        <span>Productos con stock</span>
-        <strong id="b-statProducts">0</strong>
-      </div>
-      <div class="bodStat">
-        <span>Valor estimado</span>
-        <strong id="b-statValue">$0.00</strong>
-      </div>
-      <div class="bodStat">
-        <span>Movimientos</span>
-        <strong id="b-statMoves">0</strong>
-      </div>
+      <p class="muted">Entradas de mercancía. Cada entrada se guarda en Bodega (stock separado) y queda registrada como movimiento.</p>
     </div>
   </header>
 
-  <div class="bodLayout">
-    <article class="bodPanel bodPanel--form">
-      <div class="bodPanel__head">
-        <div>
-          <span class="bodPanel__kicker">Entrada rápida</span>
-          <h2>Entrada de mercancía</h2>
-        </div>
-        <div class="bodMode" id="b-mode">Modo: Alta</div>
+  <div class="bod__grid">
+    <div class="card">
+      <div class="card__head">
+        <h2 class="h2">Entrada de mercancía</h2>
+        <div class="muted small" id="b-mode">Modo: Alta</div>
       </div>
+      <div class="divider"></div>
 
       <form id="b-form" autocomplete="off">
         <input type="hidden" id="b-id">
 
-        <div class="bodImageRow">
+        <div class="row">
           <div class="field">
-            <label>Imagen opcional</label>
+            <label>Imagen (opcional)</label>
             <input type="file" id="b-imageFile" accept="image/*">
-            <small class="muted">Si el producto no tiene imagen, se toma de aquí.</small>
+            <small class="muted">Si el producto no tiene imagen, la toma de aquí.</small>
           </div>
-          <div class="thumb" id="b-thumb">IMG</div>
+          <div class="thumbWrap">
+            <div class="thumb" id="b-thumb">IMG</div>
+          </div>
         </div>
 
         <div class="field">
-          <label>Producto</label>
-          <input id="b-productSearch" type="text" placeholder="SKU o nombre..." required>
+          <label>Producto (SKU o Nombre)</label>
+          <input id="b-productSearch" type="text" placeholder="Escribe SKU o nombre..." required>
           <div class="pick" id="b-pick" style="display:none;"></div>
           <input type="hidden" id="b-productId">
           <div class="muted small" id="b-pickedLabel"></div>
         </div>
 
-        <div class="bodFormGrid">
+        <div class="row2">
           <div class="field">
             <label>Cantidad</label>
             <input id="b-qty" type="number" min="1" step="1" value="1" required>
@@ -68,6 +45,9 @@
             <label>Costo unitario</label>
             <input id="b-unitCost" type="number" min="0" step="0.01" value="0">
           </div>
+        </div>
+
+        <div class="row2">
           <div class="field">
             <label>Proveedor</label>
             <input id="b-supplier" type="text" placeholder="Proveedor">
@@ -89,38 +69,41 @@
         </div>
         <div class="muted small" id="b-status"></div>
       </form>
-    </article>
+    </div>
 
-    <article class="bodPanel bodPanel--moves">
-      <div class="bodPanel__head">
-        <div>
-          <span class="bodPanel__kicker">Actividad</span>
-          <h2>Movimientos</h2>
-        </div>
+    <div class="card">
+      <div class="card__head">
+        <h2 class="h2">Movimientos</h2>
         <div class="field bodSearch">
           <label>Buscar</label>
           <input id="b-search" type="text" placeholder="Producto / proveedor / folio">
         </div>
       </div>
+      <div class="divider"></div>
+
       <div class="movList" id="b-list"></div>
       <div class="muted" id="b-empty" style="display:none;">Sin movimientos.</div>
-    </article>
+    </div>
   </div>
 
-  <article class="bodPanel bodPanel--stock">
-    <div class="bodPanel__head bodPanel__head--stock">
+  <div class="card card--full mt16">
+    <div class="card__head card__head--stack-mobile">
       <div>
-        <span class="bodPanel__kicker">Existencias</span>
-        <h2>Existencias en Bodega</h2>
-        <p class="muted small">Vista real de piezas disponibles por producto.</p>
+        <h2 class="h2">Existencias en Bodega</h2>
+        <div class="muted small">Vista real de piezas disponibles por producto.</div>
       </div>
       <div class="stockTools">
         <div class="field bodSearch bodSearch--small">
           <label>Buscar en existencias</label>
           <input id="b-stockSearch" type="text" placeholder="Producto / SKU / categoría">
         </div>
+        <div class="inlineActions">
+          <button type="button" class="btn btn--ghost btn--mini" id="b-exportCsv">Exportar Excel/CSV</button>
+          <button type="button" class="btn btn--ghost btn--mini" id="b-exportPdf">Imprimir / PDF</button>
+        </div>
       </div>
     </div>
+    <div class="divider"></div>
 
     <div class="tableWrap">
       <table class="stockTable">
@@ -138,5 +121,5 @@
       </table>
     </div>
     <div class="muted" id="b-stockEmpty" style="display:none;">Sin existencias en bodega.</div>
-  </article>
+  </div>
 </section>

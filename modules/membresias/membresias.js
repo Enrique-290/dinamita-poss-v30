@@ -50,10 +50,6 @@
   const mExportPdf = $("m-exportPdf");
   const mList = $("m-list");
   const mEmpty = $("m-empty");
-  const mStatActive = $("m-statActive");
-  const mStatSoon = $("m-statSoon");
-  const mStatExpired = $("m-statExpired");
-  const mStatRevenue = $("m-statRevenue");
 
   let lastTicketHtml = "";
   let lastTicketTitle = "Ticket";
@@ -65,87 +61,6 @@
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
       .replaceAll(">","&gt;");
-  }
-
-  function ensureModuleStyles(){
-    if(document.getElementById("mem-inline-style-v2")) return;
-    const style = document.createElement("style");
-    style.id = "mem-inline-style-v2";
-    style.textContent = `
-      .membresias-pro{display:grid!important;gap:16px!important;color:#111827!important}
-      .membresias-pro *{box-sizing:border-box}
-      .membresias-pro .memHero{min-height:150px!important;border-radius:8px!important;padding:22px!important;display:grid!important;grid-template-columns:minmax(260px,1fr) auto!important;gap:18px!important;align-items:center!important;color:#fff!important;background:linear-gradient(135deg,rgba(22,163,74,.94),rgba(17,24,39,.96) 48%,rgba(215,25,42,.9))!important;box-shadow:0 22px 55px rgba(22,163,74,.15)!important;overflow:hidden!important}
-      .membresias-pro .memHero h1{font-size:40px!important;line-height:1!important;margin:0!important}
-      .membresias-pro .memHero p{color:rgba(255,255,255,.88)!important;margin:0!important}
-      .membresias-pro .memHero__eyebrow{width:max-content!important;border:1px solid rgba(255,255,255,.24)!important;border-radius:999px!important;padding:7px 10px!important;background:rgba(255,255,255,.13)!important;font-size:12px!important;font-weight:900!important;text-transform:uppercase!important}
-      .membresias-pro .memStats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}
-      .membresias-pro .memStat{display:block!important;border:1px solid #e7ebf2!important;border-radius:8px!important;padding:15px!important;background:#fff!important;box-shadow:0 12px 28px rgba(15,23,42,.06)!important;border-left:4px solid #16a34a!important}
-      .membresias-pro .memStat span{display:block!important;color:#667085!important;font-size:12px!important;font-weight:900!important;text-transform:uppercase!important}
-      .membresias-pro .memStat strong{display:block!important;margin-top:5px!important;font-size:26px!important;line-height:1!important;font-weight:1000!important}
-      .membresias-pro .mem__grid{display:grid!important;grid-template-columns:minmax(350px,.9fr) minmax(0,1.35fr)!important;gap:16px!important;align-items:start!important}
-      .membresias-pro .card,.membresias-pro .memPane{border:1px solid #e7ebf2!important;border-radius:8px!important;padding:14px!important;background:#fff!important;box-shadow:0 14px 34px rgba(15,23,42,.07)!important}
-      .membresias-pro .filters{display:grid!important;grid-template-columns:minmax(180px,1fr) 132px 132px auto auto!important;gap:8px!important;align-items:center!important}
-      .membresias-pro .memList{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}
-      .membresias-pro .mcard{border:1px solid #e7ebf2!important;border-radius:8px!important;padding:12px!important;display:grid!important;grid-template-columns:48px minmax(0,1fr)!important;gap:12px!important;align-items:start!important;background:#fff!important;box-shadow:0 8px 18px rgba(15,23,42,.05)!important}
-      .membresias-pro .mavatar,.membresias-pro .mavatarFallback{width:48px!important;height:48px!important;max-width:48px!important;max-height:48px!important;border-radius:8px!important;border:1px solid #e7ebf2!important;object-fit:cover!important;display:grid!important;place-items:center!important;overflow:hidden!important;flex:0 0 48px!important}
-      .membresias-pro .mavatarFallback{background:#f2f4f7!important;color:#16a34a!important;font-weight:1000!important}
-      .membresias-pro .mactions{grid-column:2!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-      .membresias-pro .pill{padding:4px 7px!important;border-radius:999px!important;font-size:12px!important;border:1px solid #e7ebf2!important;background:#fff!important}
-      @media(max-width:1180px){.membresias-pro .memHero,.membresias-pro .mem__grid{grid-template-columns:1fr!important}.membresias-pro .memStats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-      @media(max-width:760px){.membresias-pro .memStats,.membresias-pro .filters{grid-template-columns:1fr!important}.membresias-pro .mcard{grid-template-columns:44px minmax(0,1fr)!important}.membresias-pro .mactions{grid-column:1 / -1!important}}
-    `;
-    document.head.appendChild(style);
-  }
-
-  function getClient(clientId){
-    const st = state();
-    return (st.clients||[]).find(x=>x.id===clientId) || null;
-  }
-
-  function initials(clientId){
-    const c = getClient(clientId);
-    const label = c?.name || clientId || "Cliente";
-    const parts = String(label).trim().split(/\s+/).filter(Boolean);
-    const a = parts[0]?.[0] || "C";
-    const b = parts.length > 1 ? parts[parts.length - 1][0] : "";
-    return (a + b).toUpperCase();
-  }
-
-  function clientAvatarNode(clientId, className="mavatar"){
-    const c = getClient(clientId);
-    if(c?.photo){
-      const img = document.createElement("img");
-      img.className = className;
-      img.alt = "Foto cliente";
-      img.src = c.photo;
-      img.style.cssText = "width:48px;height:48px;max-width:48px;max-height:48px;border-radius:8px;object-fit:cover;display:block;flex:0 0 48px;overflow:hidden;";
-      return img;
-    }
-    const fallback = document.createElement("div");
-    fallback.className = className + "Fallback";
-    fallback.textContent = initials(clientId);
-    fallback.style.cssText = "width:48px;height:48px;max-width:48px;max-height:48px;border-radius:8px;display:grid;place-items:center;flex:0 0 48px;overflow:hidden;";
-    return fallback;
-  }
-
-  function daysLeft(endISO){
-    const now = new Date();
-    const e = new Date(endISO);
-    if(isNaN(e.getTime())) return 9999;
-    return Math.floor((e - now) / 86400000);
-  }
-
-  function renderStats(){
-    const st = state();
-    const list = st.memberships || [];
-    const active = list.filter(m=>daysLeft(m.end) > 5).length;
-    const soon = list.filter(m=>{ const d = daysLeft(m.end); return d >= 0 && d <= 5; }).length;
-    const expired = list.filter(m=>daysLeft(m.end) < 0).length;
-    const revenue = list.filter(m=>m.saleTicketId).reduce((sum,m)=>sum + Number(m.price||0), 0);
-    if(mStatActive) mStatActive.textContent = String(active);
-    if(mStatSoon) mStatSoon.textContent = String(soon);
-    if(mStatExpired) mStatExpired.textContent = String(expired);
-    if(mStatRevenue) mStatRevenue.textContent = fmtMoney(revenue);
   }
 
   // ---------- Catalog ----------
@@ -269,20 +184,7 @@
     if(!c) return;
     mClientId.value = c.id;
     mClientSearch.value = c.name || c.id;
-    mClientPicked.innerHTML = "";
-    const card = document.createElement("div");
-    card.className = "clientPickedCard";
-    card.appendChild(clientAvatarNode(c.id, "mavatar"));
-    const info = document.createElement("div");
-    info.innerHTML = `
-      <div class="mtitle">${escapeHtml(c.name || c.id)}</div>
-      <div class="msub">
-        <span class="pill">ID: ${escapeHtml(c.id||"")}</span>
-        ${c.phone ? `<span class="pill">Tel: ${escapeHtml(c.phone)}</span>` : ""}
-      </div>
-    `;
-    card.appendChild(info);
-    mClientPicked.appendChild(card);
+    mClientPicked.textContent = `Seleccionado: ${c.name || c.id} ${c.phone ? " | "+c.phone : ""}`;
     showClientPicker([]);
   }
 
@@ -415,7 +317,6 @@
       saleTicketId: ""
     });
     mStatus.textContent = "Membresía guardada (sin cobro).";
-    renderStats();
     try{ renderList(); }catch(err){ console.error(err); }
   }
 
@@ -439,7 +340,6 @@
     }
 
     mStatus.textContent = "Membresía cobrada. Ticket: " + (ticketId||"");
-    renderStats();
     try{ renderList(); }catch(err){ console.error(err); }
 
     if(mMakeTicket.checked && ticketId){
@@ -504,7 +404,6 @@
     list.slice(0, 400).forEach(m=>{
       const div = document.createElement("div");
       div.className = "mcard";
-      div.appendChild(clientAvatarNode(m.clientId, "mavatar"));
 
       const left = document.createElement("div");
       left.className = "mleft";
@@ -543,7 +442,6 @@
       del.onclick = ()=>{
         if(!confirm(`¿Borrar membresía ${m.id}? (No borra la venta ligada)`)) return;
         dpDeleteMembership(m.id);
-        renderStats();
         renderList();
       };
 
@@ -574,7 +472,7 @@
         (m.notes||"").replaceAll("\n"," ")
       ]);
     });
-    const csv = rows.map(r=>r.map(x=>`"${String(x ?? "").replaceAll('"','""')}"`).join(",")).join("\n");
+    const csv = rows.map(r=>r.map(x=>`"${String(x??"").replaceAll('"','""')}"`).join(",")).join("\n");
     const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -639,7 +537,6 @@ ${Array.from(mList.children).map(n=>`<div class="item">${n.querySelector(".mleft
   mExportPdf.addEventListener("click", exportPdf);
 
   // Init
-  ensureModuleStyles();
   if(typeof dpEnsureSeedData === "function"){ try{ dpEnsureSeedData(); }catch(e){} }
   renderCatalog();
   loadPlans();
@@ -655,6 +552,5 @@ ${Array.from(mList.children).map(n=>`<div class="item">${n.querySelector(".mleft
       sessionStorage.removeItem("dp_prefill_client_id");
     }
   }catch(e){}
-  renderStats();
   renderList();
 })();

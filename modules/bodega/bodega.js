@@ -37,10 +37,6 @@
   const elStockEmpty = $("b-stockEmpty");
   const elExportCsv = $("b-exportCsv");
   const elExportPdf = $("b-exportPdf");
-  const elStatQty = $("b-statQty");
-  const elStatProducts = $("b-statProducts");
-  const elStatValue = $("b-statValue");
-  const elStatMoves = $("b-statMoves");
 
   let currentImageDataUrl = "";
 
@@ -365,19 +361,6 @@
     });
   }
 
-  function renderStats(){
-    const rows = buildWarehouseStockRows();
-    const st = state();
-    const stockRows = rows.filter(r=>Number(r.qty || 0) > 0);
-    const totalQty = stockRows.reduce((a,b)=>a + Number(b.qty || 0), 0);
-    const totalValue = stockRows.reduce((a,b)=>a + (Number(b.qty || 0) * Number(b.cost || 0)), 0);
-    const moves = st.warehouse?.movements?.length || 0;
-    if(elStatQty) elStatQty.textContent = String(totalQty);
-    if(elStatProducts) elStatProducts.textContent = String(stockRows.length);
-    if(elStatValue) elStatValue.textContent = dpFmtMoney(totalValue);
-    if(elStatMoves) elStatMoves.textContent = String(moves);
-  }
-
   function renderMovements(){
     const st = state();
     const q = (elSearch.value||"").trim().toLowerCase();
@@ -406,7 +389,6 @@
   function renderAll(){
     renderMovements();
     renderStockTable();
-    renderStats();
   }
 
   function download(filename, text, mime="text/plain;charset=utf-8"){

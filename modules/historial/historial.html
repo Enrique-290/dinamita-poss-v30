@@ -1,50 +1,44 @@
-<section class="historial historial-pro">
-  <header class="hisHero">
-    <div class="hisHero__copy">
-      <span class="hisHero__eyebrow">Registro de movimientos</span>
+<section class="historial">
+  <header class="his__header">
+    <div>
       <h1>Historial</h1>
-      <p>Consulta ventas, servicios y membresías, revisa tickets y reimprime comprobantes desde una vista más clara.</p>
+      <p class="muted">Ventas y membresías en un solo lugar. Filtra por fechas, reimprime tickets y borra con reversa.</p>
     </div>
   </header>
 
-  <section class="hisFilters">
-    <div class="field field--search">
-      <label>Buscar</label>
-      <input id="h-search" class="input" placeholder="Ticket / cliente / producto / concepto">
+  <div class="card">
+    <div class="card__head">
+      <h2 class="h2">Filtros</h2>
+      <div class="filters">
+        <input id="h-search" class="input" placeholder="Buscar por ticket / cliente / producto / concepto">
+        <input id="h-from" class="input" type="date">
+        <input id="h-to" class="input" type="date">
+        <button class="btn btn--ghost" type="button" id="h-clear">Limpiar</button>
+      </div>
     </div>
-    <div class="field">
-      <label>Desde</label>
-      <input id="h-from" class="input" type="date">
-    </div>
-    <div class="field">
-      <label>Hasta</label>
-      <input id="h-to" class="input" type="date">
-    </div>
-    <button class="btn btn--ghost" type="button" id="h-clear">Limpiar</button>
-  </section>
+    <div class="divider"></div>
 
-  <section class="his__stats" id="h-stats"></section>
+    <div class="his__stats" id="h-stats"></div>
+  </div>
 
   <div class="his__grid">
-    <main class="hisPane hisPane--list">
+    <div class="card">
       <div class="card__head">
-        <div>
-          <h2 class="h2">Listado</h2>
-          <div class="muted small">Busca por ticket, cliente o producto.</div>
-        </div>
+        <h2 class="h2">Listado</h2>
+        <div class="muted small">Tip: puedes buscar por “T2025…” o por nombre de cliente.</div>
       </div>
+      <div class="divider"></div>
 
       <div id="h-list" class="hisList"></div>
-      <div class="muted hisEmpty" id="h-empty" style="display:none;">Sin resultados.</div>
-    </main>
+      <div class="muted" id="h-empty" style="display:none;">Sin resultados.</div>
+    </div>
 
-    <aside class="hisPane hisPane--ticket">
+    <div class="card">
       <div class="card__head">
-        <div>
-          <h2 class="h2">Ticket</h2>
-          <div class="muted small">Previsualización del comprobante.</div>
-        </div>
+        <h2 class="h2">Ticket (previsualización)</h2>
+        <div class="muted small">Solo se imprime si lo pides.</div>
       </div>
+      <div class="divider"></div>
 
       <div class="ticketBox">
         <div class="ticketHead">
@@ -53,6 +47,6 @@
         </div>
         <div id="h-ticketPreview" class="ticketPreview muted">Selecciona una venta para ver el ticket.</div>
       </div>
-    </aside>
+    </div>
   </div>
 </section>

@@ -387,15 +387,10 @@ function dpCloseCashSession({ countedAmount=0, notes="" }={}){
     const active = cc.sessions.find(x=>x.id===cc.activeSessionId && x.status==="open");
     if(!active) throw new Error("No hay caja abierta.");
     const counted = Number(countedAmount||0);
+    const efectivo = Number(active?.totals?.byPayment?.efectivo || 0);
+    const expectedCash = Number(active.openingAmount||0) + efectivo;
     const sessionExpenses = (Array.isArray(st.expenses) ? st.expenses : []).filter(x => String(x?.cashSessionId || "") === String(active.id));
     const totalExpenses = sessionExpenses.reduce((acc, x) => acc + Number(x?.amount || 0), 0);
-    const expenseByPayment = sessionExpenses.reduce((acc, x) => {
-      const payment = String(x?.payment || "otro").toLowerCase();
-      acc[payment] = (acc[payment] || 0) + Number(x?.amount || 0);
-      return acc;
-    }, { efectivo:0, tarjeta:0, transferencia:0, otro:0 });
-    const efectivo = Number(active?.totals?.byPayment?.efectivo || 0);
-    const expectedCash = Number(active.openingAmount||0) + efectivo - Number(expenseByPayment.efectivo || 0);
     active.expenses = sessionExpenses.map(x => ({
       id: x.id,
       date: x.date,
@@ -406,7 +401,6 @@ function dpCloseCashSession({ countedAmount=0, notes="" }={}){
       notes: x.notes || ""
     }));
     active.totalExpenses = totalExpenses;
-    active.expenseByPayment = expenseByPayment;
     active.netTotal = Number(active?.totals?.total || 0) - totalExpenses;
     active.expectedCash = expectedCash;
     active.closingAmount = counted;
@@ -484,6 +478,86 @@ function dpCreateSale({clientId, cartItems, note, iva=0, paymentMethod="efectivo
     return st;
   });
 }
+
+
+
+function dpCreateWarehouseEntry({productId, qty, unitCost, supplier, date, notes, imageDataUrl}){
+  return dpSetState(st=>{
+    const id = dpId("B");
+    const at = dpNowISO();
+    const entryDate = date || at.slice(0,10);
+    const movement = {
+      id,
+      at,
+      date: entryDate,
+      productId,
+      qty: Number(qty||0),
+      unitCost: Number(unitCost||0),
+      supplier: supplier || "",
+      notes: notes || "",
+      image: imageDataUrl || ""
+    };
+
+    st.warehouse = st.warehouse || { movements: [] };
+    st.warehouse.movements = st.warehouse.movements || [];
+    st.warehouse.movements.unshift(movement);
+
+    // Affect inventory stock
+    const p = (st.products||[]).find(x=>x.id===productId);
+    if(p){
+      p.stock = Number(p.stock||0) + Number(qty||0);
+      if(Number(unitCost||0) > 0) p.cost = Number(unitCost||0);
+      p.updatedAt = at;
+      if(!p.image && imageDataUrl) p.image = imageDataUrl;
+    }
+
+    return st;
+  });
+}
+
+function dpUpdateWarehouseEntry(entryId, updates){
+  return dpSetState(st=>{
+    const mv = st.warehouse?.movements?.find(x=>x.id===entryId);
+    if(!mv) return st;
+
+    const oldQty = Number(mv.qty||0);
+    const newQty = updates.qty !== undefined ? Number(updates.qty||0) : oldQty;
+    const diff = newQty - oldQty;
+
+    Object.assign(mv, updates);
+    mv.qty = newQty;
+    mv.unitCost = updates.unitCost !== undefined ? Number(updates.unitCost||0) : Number(mv.unitCost||0);
+
+    const p = (st.products||[]).find(x=>x.id===mv.productId);
+    if(p){
+      p.stock = Number(p.stock||0) + diff;
+      if(Number(mv.unitCost||0) > 0) p.cost = Number(mv.unitCost||0);
+      if(!p.image && mv.image) p.image = mv.image;
+      p.updatedAt = dpNowISO();
+    }
+
+    return st;
+  });
+}
+
+function dpDeleteWarehouseEntry(entryId){
+  return dpSetState(st=>{
+    const mvs = st.warehouse?.movements || [];
+    const mv = mvs.find(x=>x.id===entryId);
+    if(!mv) return st;
+
+    const p = (st.products||[]).find(x=>x.id===mv.productId);
+    if(p){
+      p.stock = Math.max(0, Number(p.stock||0) - Number(mv.qty||0));
+      p.updatedAt = dpNowISO();
+    }
+
+    st.warehouse.movements = mvs.filter(x=>x.id!==entryId);
+    return st;
+  });
+}
+
+
 function dpEnsureSeedData(){
   return dpSetState(st=>{
     // Repair common corruption cases (partial localStorage writes / schema changes)
@@ -1177,15 +1251,9 @@ function dpGetExpensesByCashSessionId(sessionId){
 
 function dpGetExpenseSummaryByCashSessionId(sessionId){
   const rows = dpGetExpensesByCashSessionId(sessionId);
-  const byPayment = rows.reduce((acc, x)=>{
-    const payment = String(x?.payment || "otro").toLowerCase();
-    acc[payment] = (acc[payment] || 0) + Number(x?.amount || 0);
-    return acc;
-  }, { efectivo:0, tarjeta:0, transferencia:0, otro:0 });
   return {
     items: rows,
-    total: rows.reduce((acc, x) => acc + Number(x?.amount || 0), 0),
-    byPayment
+    total: rows.reduce((acc, x) => acc + Number(x?.amount || 0), 0)
   };
 }
 
@@ -1284,28 +1352,17 @@ function dpBuildCashCloseTicketMarkup(session){
   const opened = dpTicketDateText(session?.openedAt || "");
   const closed = dpTicketDateText(session?.closedAt || "");
   const note = String(session?.notes || "").trim();
+  const diff = Number(session?.difference || 0);
+  const diffLabel = diff === 0 ? "Sin faltantes" : (diff > 0 ? "Sobrante" : "Faltante");
   const persistedExpenses = Array.isArray(session?.expenses) ? session.expenses : null;
-  const persistedExpenseByPayment = session?.expenseByPayment || null;
   const expenseSummary = persistedExpenses
-    ? {
-        items: persistedExpenses,
-        total: Number(session?.totalExpenses || 0),
-        byPayment: persistedExpenseByPayment || persistedExpenses.reduce((acc, x)=>{
-          const payment = String(x?.payment || "otro").toLowerCase();
-          acc[payment] = (acc[payment] || 0) + Number(x?.amount || 0);
-          return acc;
-        }, { efectivo:0, tarjeta:0, transferencia:0, otro:0 })
-      }
+    ? { items: persistedExpenses, total: Number(session?.totalExpenses || 0) }
     : dpGetExpenseSummaryByCashSessionId(session?.id || "");
-  const expenseByPayment = expenseSummary.byPayment || { efectivo:0, tarjeta:0, transferencia:0, otro:0 };
   const expenseLines = (expenseSummary.items || []).map(x => `
-      <div class="t-row"><span>${dpEscapeHtml(x.description || x.category || "Gasto")} <small>(Pago: ${dpEscapeHtml(String(x.payment || "otro").toUpperCase())})</small></span><strong>${dpFmtMoney(Number(x.amount || 0))}</strong></div>
+      <div class="t-row"><span>${dpEscapeHtml(x.description || x.category || "Gasto")}</span><strong>${dpFmtMoney(Number(x.amount || 0))}</strong></div>
   `).join("");
   const totalExpenses = Number(expenseSummary.total || 0);
   const netTotal = Number(session?.netTotal != null ? session.netTotal : (Number(session?.totals?.total || 0) - totalExpenses));
-  const expectedCash = Number(session?.openingAmount || 0) + Number(byPay?.efectivo || 0) - Number(expenseByPayment.efectivo || 0);
-  const effectiveDiff = Number(session?.closingAmount || 0) - expectedCash;
-  const diffLabel = effectiveDiff === 0 ? "Sin faltantes" : (effectiveDiff > 0 ? "Sobrante" : "Faltante");
   const logoHtml = biz.logoDataUrl
     ? `<div class="t-center t-logoWrap"><img class="t-logo" src="${biz.logoDataUrl}" alt="Logo"></div>`
     : "";
@@ -1331,16 +1388,12 @@ function dpBuildCashCloseTicketMarkup(session){
       ${Number(byPay?.otro || 0) ? `<div class="t-row"><span>Ventas otro</span><strong>${dpFmtMoney(Number(byPay?.otro || 0))}</strong></div>` : ""}
       <div class="t-row"><span>Total vendido</span><strong>${dpFmtMoney(Number(session?.totals?.total || 0))}</strong></div>
       ${expenseLines ? `<div class="t-divider"></div><div class="t-title t-title--small">Gastos del turno</div>${expenseLines}` : ""}
-      ${Number(expenseByPayment.efectivo || 0) ? `<div class="t-row"><span>Gastos efectivo</span><strong>${dpFmtMoney(Number(expenseByPayment.efectivo || 0))}</strong></div>` : ""}
-      ${Number(expenseByPayment.tarjeta || 0) ? `<div class="t-row"><span>Gastos tarjeta</span><strong>${dpFmtMoney(Number(expenseByPayment.tarjeta || 0))}</strong></div>` : ""}
-      ${Number(expenseByPayment.transferencia || 0) ? `<div class="t-row"><span>Gastos transferencia</span><strong>${dpFmtMoney(Number(expenseByPayment.transferencia || 0))}</strong></div>` : ""}
-      ${Number(expenseByPayment.otro || 0) ? `<div class="t-row"><span>Gastos otro</span><strong>${dpFmtMoney(Number(expenseByPayment.otro || 0))}</strong></div>` : ""}
       <div class="t-row"><span>Total gastos</span><strong>${dpFmtMoney(totalExpenses)}</strong></div>
       <div class="t-row"><span>Neto del turno</span><strong>${dpFmtMoney(netTotal)}</strong></div>
       <div class="t-divider"></div>
-      <div class="t-row"><span>Total corte caja</span><strong>${dpFmtMoney(expectedCash)}</strong></div>
+      <div class="t-row"><span>Total corte caja</span><strong>${dpFmtMoney(Number(session?.expectedCash || 0))}</strong></div>
       <div class="t-row"><span>Dinero contado</span><strong>${dpFmtMoney(Number(session?.closingAmount || 0))}</strong></div>
-      <div class="t-row"><span>Diferencia</span><strong>${dpFmtMoney(effectiveDiff)}</strong></div>
+      <div class="t-row"><span>Diferencia</span><strong>${dpFmtMoney(diff)}</strong></div>
       <div class="t-divider"></div>
       <div class="t-row"><span>Nota</span><strong>${dpEscapeHtml(note || `${diffLabel}.`)}</strong></div>
       <div class="t-divider"></div>

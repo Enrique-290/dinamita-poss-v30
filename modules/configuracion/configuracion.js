@@ -23,13 +23,6 @@
   const elUserPassword = $("cfg-userPassword");
   const elUserRole = $("cfg-userRole");
   const elUsersList = $("cfg-usersList");
-  const elPreviewName = $("cfg-previewName");
-  const elPreviewPhone = $("cfg-previewPhone");
-  const elPreviewIva = $("cfg-previewIva");
-  const elPreviewMessage = $("cfg-previewMessage");
-  const elStatBusiness = $("cfg-statBusiness");
-  const elStatTheme = $("cfg-statTheme");
-  const elStatUsers = $("cfg-statUsers");
   let editingUserId = "";
 
   function cfg(){ return dpGetConfig(); }
@@ -104,24 +97,6 @@
     if(elUserRole) elUserRole.value = 'empleado';
   }
 
-  function updateLivePreview(){
-    if(elPreviewName) elPreviewName.textContent = elName.value.trim() || "Dinamita Gym";
-    if(elPreviewPhone) elPreviewPhone.textContent = elPhone.value.trim() || "Ticket y recibos";
-    if(elPreviewIva) elPreviewIva.textContent = `${Number(elIva.value || 0)}%`;
-    if(elPreviewMessage) elPreviewMessage.textContent = elMessage.value.trim() || "Gracias por tu compra en Dinamita Gym";
-  }
-
-  function updateStats(){
-    const c = cfg();
-    const b = c.business || {};
-    const a = c.appearance || {};
-    const users = (typeof dpGetUsers === 'function') ? dpGetUsers() : [];
-    const activeUsers = users.filter(u=>u.active!==false).length;
-    if(elStatBusiness) elStatBusiness.textContent = b.name ? "Completo" : "Pendiente";
-    if(elStatTheme) elStatTheme.textContent = (a.primary || "#c00000").toUpperCase();
-    if(elStatUsers) elStatUsers.textContent = `${activeUsers} activo(s)`;
-  }
-
   function renderUsers(){
     if(!elUsersList) return;
     const users = (typeof dpGetUsers === 'function') ? dpGetUsers() : [];
@@ -157,7 +132,6 @@
       try{
         dpSetUserActive(id, user.active===false);
         renderUsers();
-        updateStats();
       }catch(err){ alert(err.message || 'No se pudo cambiar el estado.'); }
     }));
 
@@ -168,7 +142,6 @@
         dpDeleteUser(id);
         if(editingUserId===id) resetUserForm();
         renderUsers();
-        updateStats();
       }catch(err){ alert(err.message || 'No se pudo eliminar.'); }
     }));
   }
@@ -192,9 +165,7 @@
     elText.value = a.text || "#111111";
 
     elIva.value = Number(t.ivaDefault ?? 0);
-    elMessage.value = t.message || "Gracias por tu compra en Dinamita Gym";
-    updateLivePreview();
-    updateStats();
+    elMessage.value = t.message || "Gracias por tu compra en Dinamita Gym 💥";
   }
 
   // Business save/reset
@@ -211,8 +182,6 @@
       }
     });
     applyBusinessUi();
-    updateLivePreview();
-    updateStats();
     alert("Guardado ✅");
   });
 
@@ -222,8 +191,6 @@
     });
     fill();
     applyBusinessUi();
-    updateLivePreview();
-    updateStats();
     alert("Restablecido ✅");
   });
 
@@ -236,7 +203,6 @@
       dpSetConfig({ business: { logoDataUrl: dataUrl } });
       setLogoPreview(dataUrl);
       applyBusinessUi();
-      updateStats();
       alert("Logo guardado y ajustado al ticket ✅");
     }catch(err){
       console.error(err);
@@ -248,7 +214,6 @@
     dpSetConfig({ business: { logoDataUrl:"" } });
     setLogoPreview("");
     applyBusinessUi();
-    updateStats();
   });
 
   // Appearance save/reset
@@ -262,7 +227,6 @@
       }
     });
     try{ dpApplyTheme(); }catch(e){}
-    updateStats();
     alert("Apariencia guardada ✅");
   });
 
@@ -272,7 +236,6 @@
     });
     fill();
     try{ dpApplyTheme(); }catch(e){}
-    updateStats();
     alert("Apariencia restablecida ✅");
   });
 
@@ -288,7 +251,6 @@
       elBg.value = p.bg; elPanel.value = p.panel; elPrimary.value = p.primary; elText.value = p.text;
       dpSetConfig({ appearance: p });
       try{ dpApplyTheme(); }catch(e){}
-      updateStats();
     });
   });
 
@@ -297,17 +259,15 @@
     dpSetConfig({
       ticket: {
         ivaDefault: Number(elIva.value||0),
-        message: elMessage.value.trim() || "Gracias por tu compra en Dinamita Gym"
+        message: elMessage.value.trim() || "Gracias por tu compra en Dinamita Gym 💥"
       }
     });
-    updateLivePreview();
     alert("Ticket guardado ✅");
   });
 
   $("cfg-resetTicket").addEventListener("click", ()=>{
-    dpSetConfig({ ticket: { ivaDefault:0, message:"Gracias por tu compra en Dinamita Gym" } });
+    dpSetConfig({ ticket: { ivaDefault:0, message:"Gracias por tu compra en Dinamita Gym 💥" } });
     fill();
-    updateLivePreview();
     alert("Restablecido ✅");
   });
 
@@ -315,8 +275,6 @@
   // Respaldo (Exportar / Importar)
   const elExportBackup = $("cfg-exportBackup");
   const elImportBackup = $("cfg-importBackup");
-  const elExportBackupPanel = $("cfg-exportBackupPanel");
-  const elImportBackupPanel = $("cfg-importBackupPanel");
   const elImportFile   = $("cfg-importFile");
   const elBackupStatus = $("cfg-backupStatus");
 
@@ -355,10 +313,6 @@
     });
   }
 
-  if(elExportBackupPanel && elExportBackup){
-    elExportBackupPanel.addEventListener("click", ()=>elExportBackup.click());
-  }
-
   if(elImportBackup && elImportFile){
     elImportBackup.addEventListener("click", ()=>{
       elImportFile.value = "";
@@ -393,10 +347,6 @@
     });
   }
 
-  if(elImportBackupPanel && elImportBackup){
-    elImportBackupPanel.addEventListener("click", ()=>elImportBackup.click());
-  }
-
 
   if($("cfg-saveUser")){
     $("cfg-saveUser").addEventListener("click", ()=>{
@@ -411,7 +361,6 @@
       dpSaveUser({ id: editingUserId || undefined, name, username, password, role, active:true });
       resetUserForm();
       renderUsers();
-      updateStats();
       alert('Usuario guardado ✅');
     });
   }
@@ -425,8 +374,4 @@
   fill();
   applyBusinessUi();
   renderUsers();
-  updateStats();
-  [elName, elPhone, elIva, elMessage].forEach(el=>{
-    if(el) el.addEventListener("input", updateLivePreview);
-  });
 })();

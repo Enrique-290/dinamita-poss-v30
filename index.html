@@ -4,30 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dinamita POS v0</title>
-  <link rel="stylesheet" href="assets/css/app.css">
+  <link rel="stylesheet" href="assets/css/app.css?v=30.5.6-cachefix-20260505">
 
   <!-- Preload CSS de módulos (evita "brinco" al cambiar de sección) -->
-  <link rel="stylesheet" href="modules/dashboard/dashboard.css">
-  <link rel="stylesheet" href="modules/ventas/ventas.css">
-  <link rel="stylesheet" href="modules/acceso/acceso.css">
-  <link rel="stylesheet" href="modules/inventario/inventario.css">
-  <link rel="stylesheet" href="modules/bodega/bodega.css">
-  <link rel="stylesheet" href="modules/membresias/membresias.css">
-  <link rel="stylesheet" href="modules/clientes/clientes.css">
-  <link rel="stylesheet" href="modules/historial/historial.css">
-  <link rel="stylesheet" href="modules/reportes/reportes.css">
-  <link rel="stylesheet" href="modules/configuracion/configuracion.css">
-  <link rel="stylesheet" href="modules/gastos/gastos.css">
-  <link rel="stylesheet" href="modules/pagina/pagina.css">
-  <link rel="stylesheet" href="modules/pagina3/pagina3.css">
+  <link rel="stylesheet" href="modules/dashboard/dashboard.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/ventas/ventas.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/acceso/acceso.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/inventario/inventario.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/bodega/bodega.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/membresias/membresias.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/clientes/clientes.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/historial/historial.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/reportes/reportes.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/configuracion/configuracion.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/gastos/gastos.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/pagina/pagina.css?v=30.5.6-cachefix-20260505">
+  <link rel="stylesheet" href="modules/pagina3/pagina3.css?v=30.5.6-cachefix-20260505">
 
 
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest?v=30.5.6-cachefix-20260505">
   <meta name="theme-color" content="#c00000">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png?v=30.5.6-cachefix-20260505">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=30.5.6-cachefix-20260505">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png?v=30.5.6-cachefix-20260505">
 
+  <script>window.DP_APP_VERSION = "30.5.6-cachefix-20260505";</script>
 </head>
 <body>
   <div id="app">
@@ -115,25 +116,10 @@
         </button>
       </nav>
     </aside>
-    <main id="mainArea">
-      <header class="dp-appTopbar">
-        <div class="dp-topTitle">
-          <span id="dp-moduleEyebrow">Dinamita POS</span>
-          <strong id="dp-moduleTitle">Ventas</strong>
-        </div>
-        <div class="dp-topQuick" aria-label="Accesos rápidos">
-          <button type="button" data-quick-module="ventas">Ventas</button>
-          <button type="button" data-quick-module="clientes">Clientes</button>
-          <button type="button" data-quick-module="membresias">Membresías</button>
-          <button type="button" data-quick-module="reportes">Reportes</button>
-        </div>
-        <button id="dp-logoutBtn" class="dp-userBadge" type="button" title="Cerrar sesión">
-          <span id="dp-currentUser">Sin sesión</span>
-        </button>
-      </header>
-      <section id="content"></section>
-    </main>
+    <main id="content"></main>
   </div>
+
+  <button id="dp-logoutBtn" class="dp-userBadge" type="button" title="Cerrar sesión"><span id="dp-currentUser">Sin sesión</span></button>
 
   <div id="dp-authOverlay" class="dp-authOverlay" hidden>
     <div class="dp-authCard">
@@ -151,7 +137,7 @@
     </div>
   </div>
 
-  <script src="assets/js/store.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/store.js?v=30.5.6-cachefix-20260505"></script>
+  <script src="assets/js/app.js?v=30.5.6-cachefix-20260505"></script>
 </body>
 </html>

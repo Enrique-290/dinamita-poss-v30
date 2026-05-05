@@ -30,10 +30,6 @@
 
   const elExportCsv = $("i-exportCsv");
   const elExportPdf = $("i-exportPdf");
-  const elStatProducts = $("i-statProducts");
-  const elStatLowStock = $("i-statLowStock");
-  const elStatValue = $("i-statValue");
-  const elStatCategories = $("i-statCategories");
 
   // Categories modal
   const elCatModal = $("i-catModal");
@@ -69,23 +65,6 @@
       if(selected && selected === c) opt.selected = true;
       elCategory.appendChild(opt);
     });
-  }
-
-  function money(n){
-    if(typeof dpFmtMoney === "function") return dpFmtMoney(n);
-    return Number(n||0).toLocaleString("es-MX",{ style:"currency", currency:"MXN" });
-  }
-
-  function renderStats(){
-    const st = state();
-    const products = st.products || [];
-    const cats = categoriesFromState(st);
-    const low = products.filter(p=>Number(p.stock||0) <= 5).length;
-    const value = products.reduce((sum,p)=>sum + (Number(p.price||0) * Number(p.stock||0)), 0);
-    if(elStatProducts) elStatProducts.textContent = String(products.length);
-    if(elStatLowStock) elStatLowStock.textContent = String(low);
-    if(elStatValue) elStatValue.textContent = money(value);
-    if(elStatCategories) elStatCategories.textContent = String(cats.length);
   }
 
   function setThumb(dataUrl){
@@ -177,10 +156,8 @@
       return st;
     });
 
-    const doneMsg = id ? "Producto actualizado." : "Producto agregado.";
+    elStatus.textContent = id ? "Producto actualizado." : "Producto agregado.";
     resetForm();
-    elStatus.textContent = doneMsg;
-    renderStats();
     renderList();
   }
 
@@ -203,13 +180,13 @@
     meta.innerHTML = `
       <div class="name">${p.name || "Producto"}</div>
       <div class="sub">
-        <span>${p.sku || "-"}</span>
+        <span>${p.sku || "—"}</span>
         <span>Stock: ${p.stock ?? 0}</span>
         <span>${p.category || "sin categoría"}</span>
       </div>
       <div class="sub">
-        <span>${money(p.price||0)}</span>
-        <span>Costo: ${money(p.cost||0)}</span>
+        <span>${dpFmtMoney(p.price||0)}</span>
+        <span>Cost: ${dpFmtMoney(p.cost||0)}</span>
       </div>
     `;
 
@@ -237,7 +214,6 @@
         }
         return st;
       });
-      renderStats();
       renderList();
     };
 
@@ -250,7 +226,6 @@
         st.products = (st.products||[]).filter(x=>x.id!==p.id);
         return st;
       });
-      renderStats();
       renderList();
       resetForm();
     };
@@ -344,8 +319,8 @@
                   <td>${p.sku||""}</td>
                   <td>${p.category||""}</td>
                   <td>${Number(p.stock||0)}</td>
-                  <td>${money(p.price||0)}</td>
-                  <td>${money(p.cost||0)}</td>
+                  <td>${dpFmtMoney(p.price||0)}</td>
+                  <td>${dpFmtMoney(p.cost||0)}</td>
                   <td>${p.expiry||""}</td>
                   <td>${p.lot||""}</td>
                 </tr>
@@ -394,7 +369,6 @@
           st2.meta.categories = (st2.meta.categories||[]).filter(x => String(x) !== c);
           return st2;
         });
-        renderStats();
         renderCatList();
         refreshCategorySelect();
       };
@@ -413,7 +387,6 @@
       return st;
     });
     elCatNew.value = "";
-    renderStats();
     refreshCategorySelect(name);
     renderCatList();
   }
@@ -445,6 +418,5 @@
 
   refreshCategorySelect();
   resetForm();
-  renderStats();
   renderList();
 })();
