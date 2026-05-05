@@ -196,7 +196,7 @@
   width:100%;
   border-collapse:separate;
   border-spacing:0;
-  min-width:760px;
+  min-width:980px;
 }
 .reportes-pro .repTable th,
 .reportes-pro .repTable td{
@@ -220,6 +220,7 @@
 }
 .reportes-pro .right{
   text-align:right;
+  white-space:nowrap;
 }
 .reportes-pro .repSide{
   display:flex;

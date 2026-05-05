@@ -110,8 +110,12 @@
     if(elCashStatus) elCashStatus.textContent = `Caja abierta por ${session.userName || 'Usuario'} desde ${fmtCashTime(session.openedAt)}.`;
     const byPay = session?.totals?.byPayment || {};
     const efectivo = Number(byPay.efectivo || 0);
-    const expected = Number(session.openingAmount || 0) + efectivo;
-    const expenses = cashExpenses(session.id);
+    const expensesRows = (state().expenses || []).filter(x=>String(x?.cashSessionId || "") === String(session.id || ""));
+    const expenses = expensesRows.reduce((sum,x)=>sum + Number(x?.amount || 0), 0);
+    const cashExpenses = expensesRows
+      .filter(x=>String(x?.payment || "").toLowerCase() === "efectivo")
+      .reduce((sum,x)=>sum + Number(x?.amount || 0), 0);
+    const expected = Number(session.openingAmount || 0) + efectivo - cashExpenses;
     const net = Number(session?.totals?.total || 0) - expenses;
     if(elCashSummary) elCashSummary.innerHTML = `
       <div class="cashMetric cashMetric--info"><span>Fondo</span><strong>${dpFmtMoney(session.openingAmount || 0)}</strong></div>
@@ -159,7 +163,10 @@
       setTimeout(()=>elCloseCashAmount.focus(), 20);
       return;
     }
-    const expected = Number(session.openingAmount || 0) + Number(session?.totals?.byPayment?.efectivo || 0);
+    const cashExpenses = (state().expenses || [])
+      .filter(x=>String(x?.cashSessionId || "") === String(session.id || "") && String(x?.payment || "").toLowerCase() === "efectivo")
+      .reduce((sum,x)=>sum + Number(x?.amount || 0), 0);
+    const expected = Number(session.openingAmount || 0) + Number(session?.totals?.byPayment?.efectivo || 0) - cashExpenses;
     const countedRaw = elCloseCashAmount ? elCloseCashAmount.value : prompt(`Dinero contado en caja. Esperado: ${dpFmtMoney(expected)}`, String(expected));
     if(countedRaw === null) return;
     const notes = elCloseCashNotes ? elCloseCashNotes.value : (prompt("Observaciones del cierre (opcional):", "Cierre sin faltantes.") || "");
